@@ -28,17 +28,22 @@ export interface TasksListParams {
   startDate?: string
   endDate?: string
   status?: TaskStatus
-  plan_id?: string
+  planId?: string
 }
 
 export interface CreateTaskPayload {
   title: string
   description?: string
-  scheduledDate: string
+  scheduleDate: string
   estimatedMinutes: number
   basePriority: BasePriority
 }
 
 export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
+  title?: string
   status?: TaskStatus
+  scheduleDate?: string // for rescheduling without changing the original scheduledDate
+  description?: string  // allow clearing description by passing null
+  estimatedMinutes?: number  // allow clearing estimated time by passing null
+  basePriority?: BasePriority // allow clearing priority by passing null
 }

@@ -27,21 +27,21 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
   const tasks = schedule?.tasks ?? []
   const pending = tasks.filter((t) => t.status === 'pending')
   const completed = tasks.filter((t) => t.status === 'completed')
-  const usedMinutes = schedule?.total_scheduled_minutes ?? 0
-  const totalMinutes = schedule?.daily_capacity_minutes ?? 480
+  const usedMinutes = schedule?.totalScheduledMinutes ?? 0
+  const totalMinutes = schedule?.dailyCapacityMinutes ?? 480
 
   return (
     <>
       {/* Day header */}
-      <div className="day-header">
-        <div className="day-title">
+      <div className="flex items-center justify-between mb-3.5">
+        <div className="text-[17px] font-medium text-[#1a1a2e]">
           {main}
-          {sub && <span>{sub}</span>}
+          {sub && <span className="text-[13px] font-normal text-[#9898a8] ml-1.5">{sub}</span>}
         </div>
       </div>
 
       {/* Capacity bar */}
-      <div className="cap-card">
+      <div className="bg-white border border-[#e8e8ec]/50 rounded-xl px-4 py-[13px] mb-3.5">
         <CapacityBar usedMinutes={usedMinutes} totalMinutes={totalMinutes} />
       </div>
 
@@ -50,25 +50,23 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
 
       {/* Skeleton */}
       {isLoading && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div className="flex flex-col gap-1.5">
           {[1, 2, 3].map((i) => (
-            <div key={i} style={{
-              height: '64px',
-              background: 'var(--border)',
-              borderRadius: '10px',
-              opacity: 0.5,
-            }} />
+            <div
+              key={i}
+              className="h-16 bg-[#e8e8ec] rounded-[10px] opacity-50"
+            />
           ))}
         </div>
       )}
 
       {/* Error */}
       {isError && (
-        <p role="alert" style={{ fontSize: '13px', color: 'var(--priority-high)', padding: '8px 0' }}>
+        <p role="alert" className="text-[13px] text-[#c94020] py-2">
           Failed to load tasks.{' '}
           <button
             onClick={() => window.location.reload()}
-            style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: 'inherit', textDecoration: 'underline' }}
+            className="bg-transparent border-none text-[#1a6bff] cursor-pointer text-[13px] underline"
           >
             Retry
           </button>
@@ -79,12 +77,14 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
       {!isLoading && !isError && (
         <>
           {pending.length > 0 && (
-            <div className="section-label">Pending</div>
+            <div className="text-[11px] font-medium text-[#9898a8] uppercase tracking-[0.06em] mt-1 mb-2">
+              Pending
+            </div>
           )}
 
-          <div className="task-list" role="list">
+          <div className="flex flex-col gap-1.5 mb-4" role="list">
             {pending.length === 0 ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0', fontSize: '13px', color: 'var(--text-muted)' }}>
+              <div className="flex items-center gap-2 py-2 text-[13px] text-[#9898a8]">
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
                   <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" strokeWidth="1"/>
                 </svg>
@@ -93,7 +93,7 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
             ) : (
               pending.map((task) => (
                 <div key={task.id} role="listitem">
-                  <TaskCard task={task} onEdit={onEditTask} />
+                  <TaskCard task={task} />
                 </div>
               ))
             )}
@@ -102,7 +102,7 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
           {/* Add task */}
           {onAddTask && (
             <button
-              className="add-task-btn"
+              className="flex items-center gap-2 px-3.5 py-2.5 border-[1.5px] border-dashed border-[#e8e8ec] rounded-[10px] text-[#9898a8] text-[13px] cursor-pointer bg-transparent w-full transition-[border-color,color] duration-150 hover:border-[#1a6bff] hover:text-[#1a6bff]"
               onClick={() => onAddTask(date)}
               aria-label={`Add task for ${main}`}
             >
@@ -115,14 +115,14 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
 
           {/* Completed */}
           {completed.length > 0 && (
-            <details style={{ marginTop: '12px' }}>
-              <summary className="done-toggle">
+            <details className="mt-3">
+              <summary className="flex items-center gap-1.5 text-[11px] text-[#9898a8] cursor-pointer py-1.5 select-none list-none [&::-webkit-details-marker]:hidden">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                  <path d="M2 6l3 3 5-5" stroke="var(--success)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 6l3 3 5-5" stroke="#22b573" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 {completed.length} completed
               </summary>
-              <div className="done-tasks" role="list">
+              <div className="flex flex-col gap-[5px] mt-2 opacity-60" role="list">
                 {completed.map((task) => (
                   <div key={task.id} role="listitem">
                     <TaskCard task={task} />
