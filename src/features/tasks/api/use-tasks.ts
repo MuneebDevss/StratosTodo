@@ -19,7 +19,9 @@ export function useTasks(params: TasksListParams = {}) {
     queryKey: taskKeys.list(params),
     queryFn: () =>
       apiClient.get<Task[]>('/tasks', { params }).then((r) => r.data),
+    staleTime: 30_000, // 30s — tasks don't change that fast
   })
+  
 }
 
 // Fetch the day schedule — backend returns tasks + capacity metadata
@@ -50,6 +52,7 @@ export function useGraveyardTasks() {
     queryKey: taskKeys.graveyard(),
     queryFn: () =>
       apiClient.get<Task[]>('/tasks/graveyard').then((r) => r.data),
+    staleTime: 30_000, // 30s — tasks don't change that fast
   })
 }
 
@@ -77,16 +80,29 @@ export function useCreateTask() {
 }
 
 // Update task
-export function useUpdateTask(id: string) {
+// Updated useUpdateTask
+export function useUpdateTask(id: string, previousDate?: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (payload: UpdateTaskPayload) =>
       apiClient.patch<Task>(`/tasks/${id}`, payload).then((r) => r.data),
     onSuccess: (task) => {
       qc.setQueryData(taskKeys.detail(id), task)
+      
+      // 1. Invalidate NEW date
       qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
+      
+      // 2. Invalidate OLD date (if it moved)
+      if (previousDate && previousDate !== task.scheduledDate) {
+        qc.invalidateQueries({ queryKey: taskKeys.schedule(previousDate) })
+      }
+      
+      // 3. Invalidate lists and overdue
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.overdue() })
+      
+      // 4. Invalidate graveyard if it's there
+      qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },
   })
 }
@@ -100,6 +116,7 @@ export function useDeleteTask() {
     onSuccess: ({ date }) => {
       qc.invalidateQueries({ queryKey: taskKeys.schedule(date) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
+      qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },
   })
 }
@@ -117,6 +134,7 @@ export function useCompleteTask() {
       qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.overdue() })
+      qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },
   })
 }

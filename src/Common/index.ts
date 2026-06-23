@@ -1,1 +1,2 @@
-export { Sidebar } from './components/Sidebar'
+export { Sidebar } from './components/Sidebar';
+export * from './utils/formatter'

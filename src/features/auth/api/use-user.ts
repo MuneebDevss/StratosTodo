@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 
 export interface User {
@@ -17,7 +17,7 @@ export function useUser() {
       try {
         const { data } = await apiClient.get('/users/me');
         return data;
-      } catch (error) {
+      } catch (_error: unknown) {
         // If 401 Unauthorized, return null safely instead of breaking the app
         return null;
       }
@@ -25,4 +25,18 @@ export function useUser() {
     retry: false, // Don't spam the server on auth failures
     staleTime: 1000 * 60 * 5, // Consider session fresh for 5 minutes
   });
+}
+export function useUpdateUser() {
+  const queryClient =  useQueryClient();
+  return useMutation({
+    mutationFn: async (updatedData: Partial<User>) => {
+      const { data } = await apiClient.put('/users/me', updatedData);
+      return data;
+    },
+    onSuccess: (data) => {
+      // Update the user data in the cache after a successful update
+      queryClient.setQueryData(USER_QUERY_KEY, data);
+    }
+  });
+    
 }

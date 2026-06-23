@@ -1,7 +1,9 @@
 'use client'
 
+import { SIDEBAR_THEME, ThemeKey } from '@/Common/Constants/ThemeConstants'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+
 
 const NAV_ITEMS = [
   {
@@ -61,12 +63,17 @@ const BOTTOM_ITEMS = [
   },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  theme?: ThemeKey
+}
+
+export function Sidebar({ theme = 'light' }: SidebarProps) {
   const pathname = usePathname()
+  const t = SIDEBAR_THEME[theme]
 
   return (
     <nav
-      className="w-14 bg-white border-r border-[#e8e8ec]/50 flex flex-col items-center py-4 gap-1.5 shrink-0"
+      className={`w-14 border-r flex flex-col items-center py-4 gap-1.5 shrink-0 ${t.nav}`}
       aria-label="Main navigation"
     >
       {/* Logo */}
@@ -90,10 +97,8 @@ export function Sidebar() {
           <Link
             key={href}
             href={href}
-            className={`w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer transition-[background,color] duration-150 ${
-              active
-                ? 'bg-[#eff3ff] text-[#1a6bff]'
-                : 'text-[#9898a8] hover:bg-[#f0f0f6] hover:text-[#1a1a2e]'
+            className={`w-9 h-9 rounded-lg flex items-center justify-center transition-[background,color] duration-150 ${
+              active ? t.activeItem : t.inactiveItem
             }`}
             title={label}
             aria-label={label}
@@ -112,10 +117,8 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer transition-[background,color] duration-150 ${
-                active
-                  ? 'bg-[#eff3ff] text-[#1a6bff]'
-                  : 'text-[#9898a8] hover:bg-[#f0f0f6] hover:text-[#1a1a2e]'
+              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-[background,color] duration-150 ${
+                active ? t.activeItem : t.inactiveItem
               }`}
               title={label}
               aria-label={label}

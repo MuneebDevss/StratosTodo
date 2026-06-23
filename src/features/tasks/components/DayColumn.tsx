@@ -17,10 +17,13 @@ function formatDayTitle(dateStr: string): { main: string; sub: string } {
   const d = new Date(dateStr + 'T00:00:00')
   const today = isToday(dateStr)
   const sub = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
-  return { main: today ? 'Today' : formatDateLabel(dateStr), sub: today ? sub : '' }
+  return { 
+    main: today ? 'Today' : formatDateLabel(dateStr), 
+    sub: today ? sub : '' 
+  }
 }
 
-export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
+export function DayColumn({ date, onAddTask }: DayColumnProps) {
   const { data: schedule, isLoading, isError } = useDaySchedule(date)
   const { main, sub } = formatDayTitle(date)
 
@@ -31,98 +34,130 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
   const totalMinutes = schedule?.dailyCapacityMinutes ?? 480
 
   return (
-    <>
-      {/* Day header */}
-      <div className="flex items-center justify-between mb-3.5">
-        <div className="text-[17px] font-medium text-[#1a1a2e]">
-          {main}
-          {sub && <span className="text-[13px] font-normal text-[#9898a8] ml-1.5">{sub}</span>}
+    <div className="flex flex-col h-full">
+      {/* Day Header */}
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-white">
+            {main}
+          </h2>
+          {sub && (
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              {sub}
+            </p>
+          )}
+        </div>
+        
+        {/* Optional day indicator pill */}
+        <div className="px-3 py-1 text-xs font-medium rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+          {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </div>
       </div>
 
-      {/* Capacity bar */}
-      <div className="bg-white border border-[#e8e8ec]/50 rounded-xl px-4 py-[13px] mb-3.5">
+      {/* Capacity Bar */}
+      <div className="mb-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Daily Capacity</span>
+          <span className="text-sm font-mono text-neutral-500 dark:text-neutral-400 tabular-nums">
+            {Math.round((usedMinutes / totalMinutes) * 100)}%
+          </span>
+        </div>
         <CapacityBar usedMinutes={usedMinutes} totalMinutes={totalMinutes} />
       </div>
 
-      {/* Overdue banner */}
-      <OverdueBanner />
+      {/* Overdue Banner */}
+      <div className="mb-6">
+        <OverdueBanner />
+      </div>
 
-      {/* Skeleton */}
+      {/* Loading State */}
       {isLoading && (
-        <div className="flex flex-col gap-1.5">
+        <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-16 bg-[#e8e8ec] rounded-[10px] opacity-50"
+              className="h-20 bg-neutral-200 dark:bg-neutral-800 rounded-2xl animate-pulse"
             />
           ))}
         </div>
       )}
 
-      {/* Error */}
+      {/* Error State */}
       {isError && (
-        <p role="alert" className="text-[13px] text-[#c94020] py-2">
-          Failed to load tasks.{' '}
+        <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 rounded-2xl p-6 text-center">
+          <p className="text-red-600 dark:text-red-400 text-sm">Failed to load tasks for this day.</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-transparent border-none text-[#1a6bff] cursor-pointer text-[13px] underline"
+            className="mt-3 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             Retry
           </button>
-        </p>
+        </div>
       )}
 
-      {/* Pending tasks */}
+      {/* Main Content */}
       {!isLoading && !isError && (
-        <>
-          {pending.length > 0 && (
-            <div className="text-[11px] font-medium text-[#9898a8] uppercase tracking-[0.06em] mt-1 mb-2">
-              Pending
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1.5 mb-4" role="list">
-            {pending.length === 0 ? (
-              <div className="flex items-center gap-2 py-2 text-[13px] text-[#9898a8]">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                  <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" strokeWidth="1"/>
-                </svg>
-                Nothing scheduled
+        <div className="flex-1 flex flex-col">
+          {/* Pending Tasks Section */}
+          <div className="flex-1">
+            {pending.length > 0 && (
+              <div className="uppercase tracking-[0.075em] text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 mb-3 pl-1">
+                Pending Tasks
               </div>
-            ) : (
-              pending.map((task) => (
-                <div key={task.id} role="listitem">
-                  <TaskCard task={task} />
+            )}
+
+            <div className="space-y-2.5" role="list">
+              {pending.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-4 text-center border border-dashed border-neutral-300 dark:border-neutral-700 rounded-3xl bg-neutral-50 dark:bg-neutral-900/50">
+                  <div className="w-11 h-11 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center mb-4">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M12 6v12M6 12h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <p className="text-neutral-400 dark:text-neutral-500 font-medium">No pending tasks</p>
+                  <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Add one below to get started</p>
                 </div>
-              ))
+              ) : (
+                pending.map((task) => (
+                  <div key={task.id} role="listitem">
+                    <TaskCard task={task} />
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Add Task Button */}
+            {onAddTask && (
+              <button
+                onClick={() => onAddTask(date)}
+                className="mt-5 w-full group flex items-center justify-center gap-2.5 py-3.5 px-5 border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-400 rounded-2xl text-neutral-500 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label={`Add new task for ${main}`}
+              >
+                <div className="w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 flex items-center justify-center transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <span className="font-medium text-sm">Add task</span>
+              </button>
             )}
           </div>
 
-          {/* Add task */}
-          {onAddTask && (
-            <button
-              className="flex items-center gap-2 px-3.5 py-2.5 border-[1.5px] border-dashed border-[#e8e8ec] rounded-[10px] text-[#9898a8] text-[13px] cursor-pointer bg-transparent w-full transition-[border-color,color] duration-150 hover:border-[#1a6bff] hover:text-[#1a6bff]"
-              onClick={() => onAddTask(date)}
-              aria-label={`Add task for ${main}`}
-            >
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              Add task
-            </button>
-          )}
-
-          {/* Completed */}
+          {/* Completed Tasks */}
           {completed.length > 0 && (
-            <details className="mt-3">
-              <summary className="flex items-center gap-1.5 text-[11px] text-[#9898a8] cursor-pointer py-1.5 select-none list-none [&::-webkit-details-marker]:hidden">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                  <path d="M2 6l3 3 5-5" stroke="#22b573" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                {completed.length} completed
+            <details className="mt-8 group">
+              <summary className="flex items-center gap-2.5 text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer py-2 select-none list-none hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">
+                <div className="w-4 h-4 flex items-center justify-center transition-transform group-open:rotate-90">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="font-medium">
+                  {completed.length} completed
+                </span>
               </summary>
-              <div className="flex flex-col gap-[5px] mt-2 opacity-60" role="list">
+              
+              <div className="space-y-2.5 mt-3 opacity-75" role="list">
                 {completed.map((task) => (
                   <div key={task.id} role="listitem">
                     <TaskCard task={task} />
@@ -131,8 +166,8 @@ export function DayColumn({ date, onEditTask, onAddTask }: DayColumnProps) {
               </div>
             </details>
           )}
-        </>
+        </div>
       )}
-    </>
+    </div>
   )
 }
