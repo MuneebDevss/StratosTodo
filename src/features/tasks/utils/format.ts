@@ -59,5 +59,40 @@ export function formatDateLabel(dateStr: string): string {
 }
 
 export function isToday(dateStr: string): boolean {
-  return dateStr === new Date().toISOString().slice(0, 10)
+  const today = new Date()
+  const todayStr = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, '0'),
+    String(today.getDate()).padStart(2, '0'),
+  ].join('-')
+
+  return dateStr === todayStr
+}
+
+
+function isTomorrow(dateStr: string): boolean {
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  return dateStr === tomorrow.toISOString().slice(0, 10)
+}
+
+export function formatSectionHeading(dateStr: string): string {
+  const d = new Date(dateStr)
+  const day = d.getDate()
+  const month = d.toLocaleDateString('en-US', { month: 'short' })
+  const weekday = d.toLocaleDateString('en-US', { weekday: 'long' })
+
+  if (isToday(dateStr)) return `${day} ${month} · Today · ${weekday}`
+  if (isTomorrow(dateStr)) return `${day} ${month} · Tomorrow · ${weekday}`
+  return `${day} ${month} · ${weekday}`
+}
+
+export function formatDayTitle(dateStr: string): { main: string; sub: string } {
+  const d = new Date(dateStr)
+  const today = isToday(dateStr)
+  const sub = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  return {
+    main: today ? 'Today' : formatDateLabel(dateStr),
+    sub: today ? sub : ''
+  }
 }

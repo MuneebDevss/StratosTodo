@@ -1,38 +1,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { THEMES } from '@/features/tasks/components/TaskCard'
 
-// ─── Theme tokens specific to this dialog ──────────────────────────────────────
-
-const DIALOG_THEME = {
-  light: {
-    overlay: 'bg-black/30',
-    panel: 'bg-white border-[#e8e8ec]',
-    title: 'text-[#1a1a2e]',
-    body: 'text-[#6b6b80]',
-    danger: 'bg-[#c94020] text-white hover:bg-[#b53618]',
-  },
-  dark: {
-    overlay: 'bg-black/50',
-    panel: 'bg-[#1c1c28] border-[#2e2e3e]',
-    title: 'text-[#e8e8f0]',
-    body: 'text-[#7070a0]',
-    danger: 'bg-[#c94020] text-white hover:bg-[#b53618]',
-  },
-} as const
+import { useTheme } from '@/features/settings/hooks/use-theme'
+import { ConfirmDeleteDialogProps } from '@/features/tasks'
+import { DIALOG_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 
 // ─── Component ────────────────────────────────────────────────────────────────
-
-interface ConfirmDeleteDialogProps {
-  open: boolean
-  planTitle: string
-  taskCount?: number
-  isDeleting?: boolean
-  onConfirm: () => void
-  onCancel: () => void
-  theme?: 'light' | 'dark'
-}
 
 export function ConfirmDeleteDialog({
   open,
@@ -41,9 +15,11 @@ export function ConfirmDeleteDialog({
   isDeleting = false,
   onConfirm,
   onCancel,
-  theme = 'light',
+  theme: themeProp,
 }: ConfirmDeleteDialogProps) {
-  const t = THEMES[theme]
+  const { theme: contextTheme } = useTheme()
+  const theme = themeProp ?? contextTheme
+  const t = TASK_THEMES[theme]
   const d = DIALOG_THEME[theme]
   const confirmRef = useRef<HTMLButtonElement>(null)
 

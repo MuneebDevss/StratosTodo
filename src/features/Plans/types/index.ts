@@ -6,3 +6,8 @@ export interface Plan {
   createdAt: string
   updatedAt: string
 }
+
+export interface PlanCardProps {
+  plan: Plan
+  theme?: 'light' | 'dark'
+}

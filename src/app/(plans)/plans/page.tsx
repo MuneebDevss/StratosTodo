@@ -1,11 +1,11 @@
 'use client'
 
 import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
+import type { ThemeKey } from '@/Common/Constants/ThemeConstants'
+import { useTheme } from '@/features/settings/hooks/use-theme'
 import { usePlans } from '@/features/Plans'
 import { PlanCard } from '@/features/Plans'
 import { Plan } from '@/features/Plans/types'
-
-type ThemeKey = keyof typeof PAGE_THEME
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ function EmptyState({ theme }: { theme: ThemeKey }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PlansPage() {
-  const theme: ThemeKey = 'dark' // matches the Upcoming page's established theme
+  const { theme } = useTheme()
   const t = PAGE_THEME[theme]
   const { data: plans, isLoading, isError } = usePlans()
 

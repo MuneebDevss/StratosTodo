@@ -1,31 +1,15 @@
 'use client'
 
 import { forwardRef, useState, useCallback } from 'react'
-import { TaskCard, THEMES } from './TaskCard'
-import { TaskEditShell, type EditFields } from './TaskEditShell'
-import { isToday } from '../utils/format'
-import type { DayGroup } from '../hooks/use-upcoming'
+import { TaskCard } from './TaskCard'
+import { TaskEditShell } from './TaskEditShell'
+import { isToday, formatSectionHeading } from '../utils/format'
 import { useCreateTask, useUpdateTask } from '../api/use-tasks'
+import { DaySectionProps, DropZoneProps, EditFields } from '../types'
+import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function isTomorrow(dateStr: string): boolean {
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  return dateStr === tomorrow.toISOString().slice(0, 10)
-}
-
-function formatSectionHeading(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00')
-  const day = d.getDate()
-  const month = d.toLocaleDateString('en-US', { month: 'short' })
-  const weekday = d.toLocaleDateString('en-US', { weekday: 'long' })
-
-  if (isToday(dateStr))    return `${day} ${month} · Today · ${weekday}`
-  if (isTomorrow(dateStr)) return `${day} ${month} · Tomorrow · ${weekday}`
-  return `${day} ${month} · ${weekday}`
-}
-
 const EMPTY_FIELDS: EditFields = {
   title: '',
   description: '',
@@ -37,11 +21,7 @@ const EMPTY_FIELDS: EditFields = {
 // Handles reschedule-via-drop for a single day section.
 // Kept separate so hooks run unconditionally (no task.id needed at render time).
 
-interface DropZoneProps {
-  date: string
-  theme: 'light' | 'dark'
-  children: React.ReactNode
-}
+
 
 function DropZone({ date, theme, children }: DropZoneProps) {
   const [isDragOver, setIsDragOver] = useState(false)
@@ -69,7 +49,7 @@ function DropZone({ date, theme, children }: DropZoneProps) {
     e.preventDefault()
     setIsDragOver(false)
 
-    const taskId   = e.dataTransfer.getData('application/task-id')
+    const taskId = e.dataTransfer.getData('application/task-id')
     const fromDate = e.dataTransfer.getData('application/task-date')
 
     if (!taskId || fromDate === date) return // same day — no-op
@@ -84,30 +64,23 @@ function DropZone({ date, theme, children }: DropZoneProps) {
   }
 
   const dropRingLight = 'ring-2 ring-[#1a6bff]/30 bg-[#f0f4ff]/60'
-  const dropRingDark  = 'ring-2 ring-[#3b5bdb]/40 bg-[#1a1a30]/60'
+  const dropRingDark = 'ring-2 ring-[#3b5bdb]/40 bg-[#1a1a30]/60'
 
   return (
     <div
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`rounded-[10px] transition-[box-shadow,background] duration-150 ${
-        isDragOver
-          ? theme === 'dark' ? dropRingDark : dropRingLight
-          : ''
-      }`}
+      className={`rounded-[10px] transition-[box-shadow,background] duration-150 ${isDragOver
+        ? theme === 'dark' ? dropRingDark : dropRingLight
+        : ''
+        }`}
     >
       {children}
     </div>
   )
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
-
-interface DaySectionProps {
-  group: DayGroup
-  theme?: 'light' | 'dark'
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -115,7 +88,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
   ({ group, theme = 'dark' }, ref) => {
     const heading = formatSectionHeading(group.date)
     const today = isToday(group.date)
-    const t = THEMES[theme]
+    const t = TASK_THEMES[theme]
 
     const { mutate: createTask, isPending: isCreating } = useCreateTask()
 
@@ -158,9 +131,8 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
         {/* Section heading */}
         <div
           ref={ref}
-          className={`text-[13px] font-medium mb-2 py-1 ${
-            today ? 'text-[#1a6bff]' : 'text-[#9898a8]'
-          }`}
+          className={`text-[13px] font-medium mb-2 py-1 ${today ? 'text-[#1a6bff]' : 'text-[#9898a8]'
+            }`}
           data-date={group.date}
         >
           {heading}
@@ -211,7 +183,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
             aria-label={`Add task for ${heading}`}
           >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-              <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             Add task
           </button>
@@ -225,3 +197,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
 )
 
 DaySection.displayName = 'DaySection'
+
+function isTomorrow(dateStr: any) {
+  throw new Error('Function not implemented.')
+}

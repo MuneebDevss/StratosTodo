@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useUpcoming } from '@/features/tasks/hooks/use-upcoming'
 import { Task } from '@/features/tasks'
 import { DaySection } from '@/features/tasks/components/DaySection'
-import { Sidebar } from '@/features/tasks/components/Sidebar'
+
 // Helper utilities for date management
 function parseISO(dateStr: string): Date {
   return new Date(dateStr + 'T00:00:00')
@@ -14,7 +14,7 @@ function getDayDetails(dateStr: string) {
   const date = parseISO(dateStr)
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const todayStr = formatLocalDate(new Date()) // <-- CHANGED
-  
+
   return {
     dayName: days[date.getDay()],
     dayNum: date.getDate(),
@@ -30,28 +30,28 @@ function formatLocalDate(date: Date): string {
 }
 
 export default function UpcomingPage() {
-  
+
   // Initialize with today's date (e.g., '2026-06-15')
   const [windowStart] = useState(() => {
-  const today = new Date();
-  const distanceToMonday = today.getDay() === 0 ? -6 : 1 - today.getDay();
-  today.setDate(today.getDate() + distanceToMonday);
-  return formatLocalDate(today); // <-- CHANGED
-})
+    const today = new Date();
+    const distanceToMonday = today.getDay() === 0 ? -6 : 1 - today.getDay();
+    today.setDate(today.getDate() + distanceToMonday);
+    return formatLocalDate(today); // <-- CHANGED
+  })
 
-const [activeDate, setActiveDate] = useState(() => formatLocalDate(new Date())) // <-- CHANGED
+  const [activeDate, setActiveDate] = useState(() => formatLocalDate(new Date())) // <-- CHANGED
   const [windowSize, setWindowSize] = useState(14) // Start with 2 weeks, expand dynamically
-    
+
 
   const { dayGroups, isLoading, overdueTasks } = useUpcoming(windowStart, windowSize)
 
   // 1. Calculate the active month/year text dynamically
   const displayMonthYear = useMemo(() => {
-  const d = new Date(activeDate + 'T00:00:00')
-  return d.toLocaleString('default', { month: 'long', year: 'numeric' })
-}, [activeDate])
+    const d = new Date(activeDate + 'T00:00:00')
+    return d.toLocaleString('default', { month: 'long', year: 'numeric' })
+  }, [activeDate])
 
-  
+
 
   // Maintain references to day elements for Intersection Observer & Auto-scrolling
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -119,32 +119,28 @@ const [activeDate, setActiveDate] = useState(() => formatLocalDate(new Date())) 
     }
   }
 
-  
-  // 2. Derive the 7-day row elements reactively from the scrolling focused date
-const topBarDays = useMemo(() => {
-  const current = new Date(activeDate + 'T00:00:00')
-  const dayOfWeek = current.getDay() 
-  
-  const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
-  const monday = new Date(current)
-  monday.setDate(current.getDate() + distanceToMonday)
 
-  const daysArr: string[] = []
-  for (let i = 0; i < 7; i++) {
-    const nextDay = new Date(monday)
-    nextDay.setDate(monday.getDate() + i)
-    daysArr.push(formatLocalDate(nextDay)) 
-  }
-  return daysArr
-}, [activeDate])
+  // 2. Derive the 7-day row elements reactively from the scrolling focused date
+  const topBarDays = useMemo(() => {
+    const current = new Date(activeDate + 'T00:00:00')
+    const dayOfWeek = current.getDay()
+
+    const distanceToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+    const monday = new Date(current)
+    monday.setDate(current.getDate() + distanceToMonday)
+
+    const daysArr: string[] = []
+    for (let i = 0; i < 7; i++) {
+      const nextDay = new Date(monday)
+      nextDay.setDate(monday.getDate() + i)
+      daysArr.push(formatLocalDate(nextDay))
+    }
+    return daysArr
+  }, [activeDate])
 
   return (
-    <div className="flex min-h-screen bg-[#1e1e1e] text-[#e0e0e0] font-sans antialiased">
-    <div className="sticky top-0 h-screen bg-white border-r border-[#2d2d2d]">
-      <Sidebar />
-    </div>
-    <div className=" flex-1 selection:bg-orange-500/30">
-      
+    <div className="flex flex-col min-h-screen bg-[#1e1e1e] text-[#e0e0e0] font-sans antialiased selection:bg-orange-500/30">
+
       {/* STICKY HEADER AND CALENDAR STRIP */}
       <header className="sticky top-0 z-50 bg-[#1e1e1e] border-b border-[#2d2d2d] pt-6 pb-2 px-8">
         <div className="max-w-4xl mx-auto">
@@ -153,14 +149,14 @@ const topBarDays = useMemo(() => {
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-white">Upcoming</h1>
               <button className="flex items-center gap-1 text-sm text-[#aaaaaa] hover:text-white transition mt-1 font-medium">
-              {displayMonthYear} {/* <-- CHANGED from "June 2026" */}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-            </button>
+                {displayMonthYear} {/* <-- CHANGED from "June 2026" */}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              </button>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-[#aaaaaa]">
               <button className="flex items-center gap-1.5 hover:text-white transition px-2 py-1 rounded hover:bg-[#2d2d2d]">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 Connect calendar
               </button>
               <div className="w-px h-4 bg-[#333]" />
@@ -183,17 +179,14 @@ const topBarDays = useMemo(() => {
                   onClick={() => scrollToDay(dateStr)}
                   className="flex items-center group py-2 rounded-lg transition relative"
                 >
-                  <span className={`text-[11px] font-semibold uppercase tracking-wider mx-1 ${
-                    isToday ? 'text-[#ff544a]' : 'text-[#888888] group-hover:text-gray-300'
-                  }`}>
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider mx-1 ${isToday ? 'text-[#ff544a]' : 'text-[#888888] group-hover:text-gray-300'
+                    }`}>
                     {dayName}
                   </span>
-                  
-                  <span className={`text-[10.5px] font-bold w-5 h-4 flex  justify-center rounded-sm transition ${
-                    isToday && !isActive ? 'bg-[#ff544a]/10 text-[#ff544a]' : ''
-                  } ${
-                    isActive ? 'bg-[#ff544a] text-white font-black  shadow-md shadow-red-900/20' : 'text-[#e0e0e0] group-hover:bg-[#2d2d2d]'
-                  }`}>
+
+                  <span className={`text-[10.5px] font-bold w-5 h-4 flex  justify-center rounded-sm transition ${isToday && !isActive ? 'bg-[#ff544a]/10 text-[#ff544a]' : ''
+                    } ${isActive ? 'bg-[#ff544a] text-white font-black  shadow-md shadow-red-900/20' : 'text-[#e0e0e0] group-hover:bg-[#2d2d2d]'
+                    }`}>
                     {dayNum}
                   </span>
                 </button>
@@ -204,8 +197,8 @@ const topBarDays = useMemo(() => {
       </header>
 
       {/* MAIN TASK SCROLL VIEW CONTAINER */}
-      <main className="max-w-4xl mx-auto px-8 py-6">
-        
+      <main className=" px-8 py-6">
+
         {/* OVERDUE COMPONENT SECTION */}
         {overdueTasks.length > 0 && (
           <div className="mb-10 border-b border-[#2d2d2d] pb-6">
@@ -220,11 +213,11 @@ const topBarDays = useMemo(() => {
                 Reschedule
               </button>
             </div>
-            
+
             <div className="space-y-1 pl-6">
               {overdueTasks.map((task: Task) => (
-                <div 
-                  key={task.id} 
+                <div
+                  key={task.id}
                   className="flex items-start gap-3 p-3 rounded-lg hover:bg-[#252525] group transition border border-transparent hover:border-[#2d2d2d]"
                 >
                   <button className="mt-0.5 w-[18px] h-[18px] rounded-full border-2 border-blue-400 hover:bg-blue-400/20 flex items-center justify-center transition flex-shrink-0" />
@@ -237,7 +230,7 @@ const topBarDays = useMemo(() => {
                     )}
                     <div className="flex items-center gap-3 mt-1.5 text-[11px] text-[#888888]">
                       <span className="text-[#ff544a] font-medium flex items-center gap-1">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         {task.scheduledDate}
                       </span>
                       {task.estimatedMinutes > 0 && <span>{task.estimatedMinutes}m</span>}
@@ -281,7 +274,6 @@ const topBarDays = useMemo(() => {
           )}
         </div>
       </main>
-    </div>
     </div>
   )
 }

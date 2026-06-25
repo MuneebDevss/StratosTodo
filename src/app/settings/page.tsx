@@ -5,8 +5,7 @@ import { EditableField } from '@/features/settings/components/EditableField'
 import { ThemeToggle } from '@/features/settings/components/ThemeToggle'
 import { ConnectClaudeCard } from '@/features/settings/components/ConnectClaudeCard'
 import { useTheme } from '@/features/settings/hooks/use-theme'
-import { THEMES } from '@/features/tasks/components/TaskCard'
-import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
+import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { TIMEZONE_OPTIONS } from '@/Common/Constants/TimeZones'
 import { formatMinutes } from '@/Common'
 
@@ -15,10 +14,11 @@ import { formatMinutes } from '@/Common'
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const pt = PAGE_THEME[theme]
-  const t = THEMES[theme]
+  const t = TASK_THEMES[theme]
 
   const { data: user, isLoading } = useUser()
   const { mutate: updateUser, isPending } = useUpdateUser()
+
 
   if (isLoading) {
     return (
@@ -62,7 +62,7 @@ export default function SettingsPage() {
                 value={user.email}
                 kind="text"
                 disabled // email changes typically need re-verification — edit elsewhere
-                onSave={() => {}}
+                onSave={() => { }}
                 theme={theme}
               />
               <EditableField

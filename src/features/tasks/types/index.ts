@@ -1,3 +1,5 @@
+import { TASK_THEMES } from "@/Common/Constants/ThemeConstants"
+
 export type BasePriority = 'low' | 'medium' | 'high'
 export type TaskStatus = 'pending' | 'completed' | 'graveyard'
 
@@ -46,4 +48,64 @@ export interface UpdateTaskPayload extends Partial<CreateTaskPayload> {
   description?: string  // allow clearing description by passing null
   estimatedMinutes?: number  // allow clearing estimated time by passing null
   basePriority?: BasePriority // allow clearing priority by passing null
+}
+
+export interface EditFields {
+  title: string
+  description: string
+  priority: string
+  minutes: string
+}
+
+export interface TaskEditShellProps {
+  fields: EditFields
+  onChange: (fields: EditFields) => void
+  onSave: () => void
+  onCancel: () => void
+  isSaving?: boolean
+  saveLabel?: string
+  /** Themed token set from THEMES['light'] or THEMES['dark'] */
+  t: (typeof TASK_THEMES)[keyof typeof TASK_THEMES]
+  theme: 'light' | 'dark'
+}
+export interface TaskCardProps {
+  task: Task
+  onEdit?: (task: Task) => void
+  theme?: 'light' | 'dark'
+  onThemeToggle?: () => void
+  showThemeToggle?: boolean
+}
+
+export interface DayColumnProps {
+  date: string
+  onEditTask?: (task: Task) => void
+  onAddTask?: (date: string) => void
+}
+
+export interface ConfirmDeleteDialogProps {
+  open: boolean
+  planTitle: string
+  taskCount?: number
+  isDeleting?: boolean
+  onConfirm: () => void
+  onCancel: () => void
+  theme?: 'light' | 'dark'
+}
+
+export interface DaySectionProps {
+  group: DayGroup
+  theme?: 'light' | 'dark'
+}
+
+export interface DropZoneProps {
+  date: string
+  theme: 'light' | 'dark'
+  children: React.ReactNode
+}
+
+export interface DayGroup {
+  date: string           // 'YYYY-MM-DD'
+  tasks: Task[]
+  usedMinutes: number
+  totalMinutes: number   // from user's daily_capacity_minutes
 }

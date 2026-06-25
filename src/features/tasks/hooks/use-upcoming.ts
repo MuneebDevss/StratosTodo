@@ -1,14 +1,8 @@
 import { useMemo } from 'react'
 import { useTasks } from '../api/use-tasks'
 import { useUser } from '@/features/auth/api/use-user'
-import type { Task } from '../types'
+import type { DayGroup, Task } from '../types'
 
-export interface DayGroup {
-  date: string           // 'YYYY-MM-DD'
-  tasks: Task[]
-  usedMinutes: number
-  totalMinutes: number   // from user's daily_capacity_minutes
-}
 
 function getWindowDates(startDate: string, count: number): string[] {
   const dates: string[] = []
@@ -30,9 +24,9 @@ export function useUpcoming(windowStart: string, windowSize = 7) {
     endDate: windowEnd,
     status: 'pending',
   })
-  
 
-  const { data: user, isLoading: userLoading } =  useUser()
+
+  const { data: user, isLoading: userLoading } = useUser()
   const dailyCapacity = user?.dailyCapacityMinutes ?? 480
 
   const dayGroups = useMemo<DayGroup[]>(() => {

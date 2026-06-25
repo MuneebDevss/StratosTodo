@@ -21,7 +21,7 @@ export function useTasks(params: TasksListParams = {}) {
       apiClient.get<Task[]>('/tasks', { params }).then((r) => r.data),
     staleTime: 30_000, // 30s — tasks don't change that fast
   })
-  
+
 }
 
 // Fetch the day schedule — backend returns tasks + capacity metadata
@@ -42,7 +42,7 @@ export function useOverdueTasks() {
     queryKey: taskKeys.overdue(),
     queryFn: () =>
       apiClient.get<Task[]>('/tasks/overdue').then((r) => r.data),
-    refetchInterval: 60_000, // Poll every minute
+    refetchInterval: 60_000
   })
 }
 
@@ -73,7 +73,7 @@ export function useCreateTask() {
       apiClient.post<Task>('/tasks', payload).then((r) => r.data),
     onSuccess: (task) => {
       // Invalidate the schedule for the task's date + list queries
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate.toString().split('T')[0]) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
     },
   })
@@ -88,19 +88,13 @@ export function useUpdateTask(id: string, previousDate?: string) {
       apiClient.patch<Task>(`/tasks/${id}`, payload).then((r) => r.data),
     onSuccess: (task) => {
       qc.setQueryData(taskKeys.detail(id), task)
-      
-      // 1. Invalidate NEW date
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
-      
-      // 2. Invalidate OLD date (if it moved)
-      if (previousDate && previousDate !== task.scheduledDate) {
-        qc.invalidateQueries({ queryKey: taskKeys.schedule(previousDate) })
-      }
-      
+
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate.toString().split('T')[0]) })
+
       // 3. Invalidate lists and overdue
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.overdue() })
-      
+
       // 4. Invalidate graveyard if it's there
       qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },
@@ -114,7 +108,7 @@ export function useDeleteTask() {
     mutationFn: ({ id, date }: { id: string; date: string }) =>
       apiClient.delete(`/tasks/${id}`).then(() => ({ id, date })),
     onSuccess: ({ date }) => {
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(date) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(date.toString().split('T')[0]) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },
@@ -131,7 +125,7 @@ export function useCompleteTask() {
         .then((r) => r.data),
     onSuccess: (task) => {
       qc.setQueryData(taskKeys.detail(task.id), task)
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate.toString().split('T')[0]) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.overdue() })
       qc.invalidateQueries({ queryKey: taskKeys.graveyard() })

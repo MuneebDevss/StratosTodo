@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { THEMES } from '@/features/tasks/components/TaskCard'
 import { useMcpStatus } from '../hooks/use-mcp-status'
+import { useTheme } from '@/features/settings/hooks/use-theme'
+import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 
 /**
  * ConnectClaudeCard
@@ -80,9 +81,8 @@ function StatusPill({
 }) {
   if (isLoading) {
     return (
-      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${
-        theme === 'dark' ? 'bg-[#24243a] text-[#7070a0]' : 'bg-[#f5f5f7] text-[#9898a8]'
-      }`}>
+      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${theme === 'dark' ? 'bg-[#24243a] text-[#7070a0]' : 'bg-[#f5f5f7] text-[#9898a8]'
+        }`}>
         Checking…
       </span>
     )
@@ -90,20 +90,18 @@ function StatusPill({
 
   if (connected) {
     return (
-      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${
-        theme === 'dark' ? 'bg-[#0d2a1c] text-[#3ddc8a]' : 'bg-[#e8f9f0] text-[#0e8a4f]'
-      }`}>
-        <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3"/></svg>
+      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${theme === 'dark' ? 'bg-[#0d2a1c] text-[#3ddc8a]' : 'bg-[#e8f9f0] text-[#0e8a4f]'
+        }`}>
+        <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3" /></svg>
         Connected{clientName ? ` via ${clientName}` : ''}
       </span>
     )
   }
 
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${
-      theme === 'dark' ? 'bg-[#24243a] text-[#7070a0]' : 'bg-[#f5f5f7] text-[#9898a8]'
-    }`}>
-      <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3"/></svg>
+    <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${theme === 'dark' ? 'bg-[#24243a] text-[#7070a0]' : 'bg-[#f5f5f7] text-[#9898a8]'
+      }`}>
+      <svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="3" /></svg>
       Not connected
     </span>
   )
@@ -115,8 +113,10 @@ interface ConnectClaudeCardProps {
   theme?: 'light' | 'dark'
 }
 
-export function ConnectClaudeCard({ theme = 'light' }: ConnectClaudeCardProps) {
-  const t = THEMES[theme]
+export function ConnectClaudeCard({ theme: themeProp }: ConnectClaudeCardProps) {
+  const { theme: contextTheme } = useTheme()
+  const theme = themeProp ?? contextTheme
+  const t = TASK_THEMES[theme]
   const { data: status, isLoading } = useMcpStatus()
   const [activeTab, setActiveTab] = useState<ClientTab>('claude_ai')
   const [copied, setCopied] = useState(false)
@@ -154,11 +154,10 @@ export function ConnectClaudeCard({ theme = 'light' }: ConnectClaudeCardProps) {
           readOnly
           value={MCP_SERVER_URL}
           onFocus={(e) => e.target.select()}
-          className={`flex-1 text-[12px] font-mono px-3 py-2 rounded-[7px] border ${
-            theme === 'dark'
+          className={`flex-1 text-[12px] font-mono px-3 py-2 rounded-[7px] border ${theme === 'dark'
               ? 'bg-[#141420] border-[#2e2e3e] text-[#b0b0c8]'
               : 'bg-[#f5f5f7] border-[#e8e8ec] text-[#1a1a2e]'
-          }`}
+            }`}
           aria-label="MCP server URL"
         />
         <button
@@ -185,13 +184,12 @@ export function ConnectClaudeCard({ theme = 'light' }: ConnectClaudeCardProps) {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`px-3 py-2 text-[12px] font-medium cursor-pointer transition-colors duration-150 border-b-2 -mb-px ${
-              activeTab === tab.key
+            className={`px-3 py-2 text-[12px] font-medium cursor-pointer transition-colors duration-150 border-b-2 -mb-px ${activeTab === tab.key
                 ? theme === 'dark'
                   ? 'border-[#3b5bdb] text-[#e8e8f0]'
                   : 'border-[#1a6bff] text-[#1a1a2e]'
                 : `border-transparent ${t.description}`
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -202,9 +200,8 @@ export function ConnectClaudeCard({ theme = 'light' }: ConnectClaudeCardProps) {
       <ol className="flex flex-col gap-2">
         {STEPS[activeTab].map((step, i) => (
           <li key={i} className={`flex gap-2.5 text-[13px] leading-[1.5] ${t.description}`}>
-            <span className={`shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-semibold mt-px ${
-              theme === 'dark' ? 'bg-[#24243a] text-[#9a82ff]' : 'bg-[#f0eeff] text-[#4a35b0]'
-            }`}>
+            <span className={`shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-semibold mt-px ${theme === 'dark' ? 'bg-[#24243a] text-[#9a82ff]' : 'bg-[#f0eeff] text-[#4a35b0]'
+              }`}>
               {i + 1}
             </span>
             <span>{step}</span>

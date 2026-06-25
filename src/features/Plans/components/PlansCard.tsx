@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { THEMES } from '@/features/tasks/components/TaskCard'
-import type { Plan } from '../types'
+import type { Plan, PlanCardProps } from '../types'
+import { TASK_THEMES } from '@/Common/Constants/ThemeConstants';
 
 // ─── Source badge ───────────────────────────────────────────────────────────
 
@@ -24,7 +24,7 @@ const SOURCE_BADGE: Record<Plan['source'], { label: string; light: string; dark:
 function SparkleIcon() {
   return (
     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-      <path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round"/>
+      <path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -32,22 +32,19 @@ function SparkleIcon() {
 function ChevronIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M5.25 3.5l4.5 3.5-4.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5.25 3.5l4.5 3.5-4.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-interface PlanCardProps {
-  plan: Plan
-  theme?: 'light' | 'dark'
-}
+
 
 export function PlanCard({ plan, theme = 'light' }: PlanCardProps) {
-  const t = THEMES[theme]
+  const t = TASK_THEMES[theme]
   const badge = SOURCE_BADGE[plan.source]
-  
+
 
   return (
     <Link
@@ -69,7 +66,7 @@ export function PlanCard({ plan, theme = 'light' }: PlanCardProps) {
             {plan.source === 'mcp' && <SparkleIcon />}
             {badge.label}
           </span>
-          
+
         </div>
       </div>
 

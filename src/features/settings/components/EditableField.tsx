@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useRef, useCallback, useLayoutEffect } from 'react'
-import { THEMES } from '@/features/tasks/components/TaskCard'
+
+import { useTheme } from '@/features/settings/hooks/use-theme'
+import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 
 /**
  * EditableField
@@ -54,11 +56,13 @@ export function EditableField({
   onSave,
   isSaving = false,
   disabled = false,
-  theme = 'light',
+  theme: themeProp,
   suffix,
   min,
 }: EditableFieldProps) {
-  const t = THEMES[theme]
+  const { theme: contextTheme } = useTheme()
+  const theme = themeProp ?? contextTheme
+  const t = TASK_THEMES[theme]
   const [isEditing, setIsEditing] = useState(false)
   const [draft, setDraft] = useState(value)
   const inputRef = useRef<HTMLInputElement | HTMLSelectElement>(null)
@@ -102,11 +106,10 @@ export function EditableField({
           type="button"
           disabled={disabled}
           onClick={startEditing}
-          className={`text-[13px] text-right truncate max-w-[260px] rounded-[6px] px-2 py-1 -mr-2 transition-colors duration-150 ${
-            disabled
+          className={`text-[13px] text-right truncate max-w-[260px] rounded-[6px] px-2 py-1 -mr-2 transition-colors duration-150 ${disabled
               ? `cursor-default ${t.title}`
               : `cursor-pointer ${t.title} hover:${theme === 'dark' ? 'bg-[#24243a]' : 'bg-[#f5f5f7]'}`
-          }`}
+            }`}
           aria-label={`Edit ${label}`}
         >
           {displayValue ?? value}

@@ -1,5 +1,6 @@
 'use client'
 
+import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 /**
  * TaskEditShell
  * ─────────────
@@ -12,28 +13,7 @@
  */
 
 import { useRef, useEffect } from 'react'
-import type { THEMES } from './TaskCard'
-
-// ─── Public types ─────────────────────────────────────────────────────────────
-
-export interface EditFields {
-  title: string
-  description: string
-  priority: string
-  minutes: string
-}
-
-export interface TaskEditShellProps {
-  fields: EditFields
-  onChange: (fields: EditFields) => void
-  onSave: () => void
-  onCancel: () => void
-  isSaving?: boolean
-  saveLabel?: string
-  /** Themed token set from THEMES['light'] or THEMES['dark'] */
-  t: (typeof THEMES)[keyof typeof THEMES]
-  theme: 'light' | 'dark'
-}
+import { EditFields, TaskEditShellProps } from '../types'
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -55,8 +35,8 @@ export function TaskEditShell({
 
   const set =
     (key: keyof EditFields) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-      onChange({ ...fields, [key]: e.target.value })
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+        onChange({ ...fields, [key]: e.target.value })
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') onCancel()
@@ -69,9 +49,8 @@ export function TaskEditShell({
       <div className="flex items-start gap-3">
         {/* Placeholder checkbox — visual alignment, not interactive during create */}
         <div
-          className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 ${
-            theme === 'dark' ? 'border-[#3a3a55]' : 'border-[#d0d0da]'
-          }`}
+          className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 ${theme === 'dark' ? 'border-[#3a3a55]' : 'border-[#d0d0da]'
+            }`}
           aria-hidden="true"
         />
 
@@ -103,8 +82,8 @@ export function TaskEditShell({
             {/* Duration input */}
             <div className="inline-flex items-center gap-1">
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true" className={t.score}>
-                <circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" strokeWidth="1"/>
-                <path d="M5.5 3v2.5l1.5 1" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+                <circle cx="5.5" cy="5.5" r="4.5" stroke="currentColor" strokeWidth="1" />
+                <path d="M5.5 3v2.5l1.5 1" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
               </svg>
               <input
                 type="number"

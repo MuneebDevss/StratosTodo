@@ -9,19 +9,10 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
-      const { data } = await apiClient.post('/auth/login', credentials);
-      return data;
+      await apiClient.post('/auth/login', credentials);
     },
-    onSuccess: (data : { user?: User }) => {
-    if (!data || typeof data !== 'object') {
-      console.warn('Login response is not an object:', data);
-      return;
-    }
-      // 1. Manually prime or invalidate the user cache instantly
-      queryClient.setQueryData(USER_QUERY_KEY, data.user || data);
-      
-      // 2. Perform clean client-side routing change
-      router.push('/dashboard');
+    onSuccess: () => {
+      router.replace('/dashboard');
     },
   });
 }

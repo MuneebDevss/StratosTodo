@@ -3,12 +3,16 @@
 import { SIDEBAR_THEME, type ThemeKey } from '@/Common/Constants/ThemeConstants'
 import { useOverdueTasks } from '../api/use-tasks'
 import { useRunReschedule } from '../api/use-reschedule'
+import { useTheme } from '@/features/settings/hooks/use-theme'
 
 interface OverdueBannerProps {
   theme?: ThemeKey
 }
 
-export function OverdueBanner({ theme = 'light' }: OverdueBannerProps) {
+export function OverdueBanner({ theme: themeProp }: OverdueBannerProps) {
+  const { theme: contextTheme } = useTheme()
+  const theme = themeProp ?? contextTheme
+
   const { data: overdueTasks = [] } = useOverdueTasks()
   const { mutate: runReschedule, isPending, data: result } = useRunReschedule()
   const t = SIDEBAR_THEME[theme]

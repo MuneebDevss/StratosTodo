@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
-  Calendar,
   ArrowRight,
   Clock,
   CheckCircle2,
@@ -15,22 +14,25 @@ import {
   ChevronDown,
   Menu,
   X,
-  Zap,
-  Smile
+  Battery,
+  Layers,
+  Compass,
+  ShieldCheck,
+  History
 } from 'lucide-react';
 
-// --- Accessible Testimonials & FAQ Data ---
+// --- Relatable Testimonials & Product FAQs ---
 const testimonials = [
-  { quote: "Stratos did what normal calendars couldn't. When my morning went off the rails, it recalculated my whole week without me spending an hour dragging boxes around.", author: "Sarah Jenkins", role: "Creative Director", metric: "Saved 6 hours/week" },
-  { quote: "The AI assistant actually understands my limits. It doesn't just pile on tasks; it builds an actual strategy based on how much energy I have.", author: "Marcus Chen", role: "Small Business Founder", metric: "100% Goal Completion" },
-  { quote: "I finally stopped looking at an endless list of overdue red tasks. The smart rebalancing keeps my days realistic and stress-free.", author: "Elena Rostova", role: "Marketing Consultant", metric: "Reduced Burnout by 40%" }
+  { quote: "Stratos did what normal calendars couldn't. When my morning went off the rails, it rebalanced my whole week without me spending an hour dragging boxes around.", author: "Sarah Jenkins", role: "Creative Director", metric: "Saved 6 hours/week" },
+  { quote: "Connecting my own Claude account was a game-changer. It generated an entire 6-week study schedule that automatically adapts when I get behind.", author: "Marcus Chen", role: "Graduate Student", metric: "100% Plan Completion" },
+  { quote: "I finally stopped looking at an endless list of overdue red tasks. The system quietly moves things I miss to a 'Needs Review' folder so tomorrow stays clean.", author: "Elena Rostova", role: "Marketing Consultant", metric: "Reduced Burnout by 40%" }
 ];
 
 const faqs = [
-  { q: "How does the AI generate my plans?", a: "Instead of just giving you a generic checklist, Stratos looks at the big picture: your ultimate goals, your personal working style, your routine, and your existing commitments. It then designs a realistic, step-by-step roadmap tailored specifically to your life." },
-  { q: "How secure is my personal information?", a: "Your privacy is our absolute priority. We only use secure connectors to process your goals, and your private notes, calendar items, and personal details are strictly encrypted and kept confidential. We never sell your data." },
-  { q: "What exactly happens when I miss a task?", a: "Nothing breaks. The system notices the delay, checks how important the task is, looks at your upcoming deadlines, and automatically slides it into your next best open slot. It balances your workload so tomorrow doesn't become overwhelming." },
-  { q: "Can I manually change or lock my schedule?", a: "Of course. You are always in control. You can pin any event, meeting, or specific task to a exact time. The rescheduling engine treats your pinned items as unmovable and organizes everything else gracefully around them." }
+  { q: "How does the assistant build these long-term plans?", a: "By linking Stratos to your personal Claude account, you can outline a large goal in plain English. The assistant checks your existing commitments and builds a tailored, day-by-day roadmap that loads right into your schedule." },
+  { q: "What happens behind the scenes when I miss a task?", a: "No complex math or guessing games. The system automatically shifts your missed item to your next open slot. If your day gets too crowded, it runs a gentle evaluation: high-priority items stay put, and less urgent ones slide forward to protect your time." },
+  { q: "What is the 'Needs Review' list and how does it prevent overwhelm?", a: "If a low-priority task gets bumped three times in a row, the app steps in. Instead of letting it clutter your calendar forever, it puts the task into a quiet 'Needs Review' safety net so you can decide to drop it, finish it, or plan it for later." },
+  { q: "Are there any hidden monthly limits or AI usage fees?", a: "None at all. Because Stratos hooks directly into your existing assistant tools, we don't have to charge you extra for generating massive projects, multi-week breakdowns, or complex agendas." }
 ];
 
 export default function Home() {
@@ -38,10 +40,11 @@ export default function Home() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [simStep, setSimStep] = useState(0);
 
+  // Auto-rotating mockup simulation to showcase the capacity engine mechanics
   useEffect(() => {
     const timer = setInterval(() => {
       setSimStep((prev) => (prev + 1) % 3);
-    }, 4500);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -67,7 +70,7 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-zinc-400 hover:text-zinc-100 transition-colors">Sign In</Link>
             <Link href="/register" className="h-9 px-4 rounded-lg bg-white hover:bg-zinc-200 text-black text-sm font-medium tracking-tight transition-all shadow-sm flex items-center">
-              Get Started Free
+              Start Free
             </Link>
           </div>
 
@@ -87,428 +90,302 @@ export default function Home() {
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">FAQ</a>
             <div className="h-px bg-zinc-800 my-2" />
             <Link href="/login" className="block text-zinc-300">Sign In</Link>
-            <Link href="/register" className="block w-full py-2.5 text-center rounded-lg bg-indigo-600 text-white font-medium">Get Started Free</Link>
+            <Link href="/register" className="block w-full py-2.5 text-center rounded-lg bg-indigo-600 text-white font-medium">Start Free</Link>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* 2. HERO SECTION */}
-      <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.08),transparent_55%)] pointer-events-none" />
+      <section className="relative pt-20 pb-16 md:pt-28 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.06),transparent_55%)] pointer-events-none" />
 
         <div className="text-center max-w-3xl mx-auto space-y-6">
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800/80 text-xs text-zinc-400">
-            <Sparkles size={12} className="text-indigo-400" /> Stop rebuilding your schedule every time life changes.
+            <Sparkles size={12} className="text-indigo-400" /> A capacity-aware schedule that respects your true limits.
           </motion.div>
 
-          <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="text-4xl sm:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500">
-            AI plans your work. <br className="hidden sm:block" />Smart scheduling keeps it on track.
+          <motion.h1 initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="text-4xl sm:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-zinc-200 to-zinc-500 leading-tight">
+            The to-do list that <br className="hidden sm:block" />balances itself.
           </motion.h1>
 
           <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Turn your biggest goals into realistic, step-by-step daily plans using smart AI. When plans inevitably break, an intelligent scheduling engine automatically fixes your schedule so you don't have to.
+            Break big milestones down with an assistant you already trust. When plans shift, our custom time-budget engine automatically re-arranges your tasks—protecting you from calendar overload and past-due guilt.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link href="/register" className="h-12 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center justify-center gap-2 group transition-all shadow-lg shadow-indigo-600/20">
-              Start Planning Free <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              Start Free Blueprinting <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <button className="h-12 px-6 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-medium transition-colors">
-              Watch Demo
-            </button>
           </motion.div>
         </div>
 
-        {/* INTERACTIVE DASHBOARD MOCKUP */}
-        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.4 }} className="mt-16 relative rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-4 sm:p-6 shadow-2xl backdrop-blur-xl">
-          <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
+        {/* 3. ENGINE DEMO MOCKUP */}
+        <motion.div initial={{ opacity: 0, scale: 0.99 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7, delay: 0.4 }} className="mt-16 relative rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-4 sm:p-6 shadow-2xl backdrop-blur-xl">
+          <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
 
-          {/* Mock Window Controls */}
+          {/* Top Control Bar */}
           <div className="flex items-center justify-between border-b border-zinc-900 pb-4 mb-6">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-zinc-800" />
-              <span className="w-3 h-3 rounded-full bg-zinc-800" />
-              <span className="w-3 h-3 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+              <span className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
             </div>
-            <div className="text-xs text-zinc-500 bg-zinc-900/60 px-3 py-1 rounded-md">
-              Your Adaptive Planner
+            <div className="text-xs text-zinc-400 font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
+              Stratos Balancing Engine Simulation
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Box: Input Goal Context */}
-            <div className="lg:col-span-4 space-y-4 border-r border-transparent lg:border-zinc-900 lg:pr-6">
-              <h3 className="text-xs font-semibold tracking-wider uppercase text-indigo-400 flex items-center gap-1.5">
-                <Brain size={14} /> The Goal
+            {/* Left Box: Constraints & Priority Logic */}
+            <div className="lg:col-span-4 space-y-4 lg:border-r lg:border-zinc-900 lg:pr-6">
+              <h3 className="text-xs font-semibold tracking-wider uppercase text-zinc-400 flex items-center gap-1.5">
+                <Battery size={14} className="text-indigo-400" /> Your Time Budget
               </h3>
-              <div className="bg-zinc-900/40 border border-zinc-800 p-4 rounded-xl space-y-3">
-                <div className="text-xs text-zinc-400">What are you working toward?</div>
-                <div className="text-sm font-medium text-white bg-black/40 p-2.5 rounded-md border border-zinc-900">
-                  "Launch my new website & freelance business"
+
+              <div className="bg-zinc-900/40 border border-zinc-800/80 p-4 rounded-xl space-y-3">
+                <div className="flex justify-between text-xs">
+                  <span className="text-zinc-400">Daily Free Time Window:</span>
+                  <span className="text-white font-mono font-medium">4 Hours</span>
                 </div>
-                <div className="space-y-1.5">
-                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Your Constraints</span>
-                  <div className="flex flex-wrap gap-1.5 text-[11px]">
-                    <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">Avail: 3 hours/day</span>
-                    <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">Weekends off</span>
-                    <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">Evenings preferred</span>
-                  </div>
+
+                {/* Dynamic Capacity Bar Graphic */}
+                <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden">
+                  <motion.div
+                    animate={{
+                      width: simStep === 0 ? '75%' : simStep === 1 ? '115%' : '90%',
+                      backgroundColor: simStep === 1 ? '#ef4444' : '#6366f1'
+                    }}
+                    className="h-full transition-all duration-500"
+                  />
+                </div>
+
+                <div className="flex justify-between text-[11px] text-zinc-500 pt-1">
+                  <span>0h</span>
+                  <span>{simStep === 1 ? 'Overloaded! (4.5h)' : 'Comfortable'}</span>
+                  <span>4h Max</span>
                 </div>
               </div>
 
-              {/* Engine Status State Indicator */}
-              <div className="bg-zinc-900/20 border border-dashed border-zinc-800 p-3 rounded-xl flex items-center gap-3">
-                <div className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </div>
-                <div className="text-xs">
-                  {simStep === 0 && <span className="text-zinc-400">Status: <b className="text-zinc-200">Analyzing your day...</b></span>}
-                  {simStep === 1 && <span className="text-amber-400">Conflict Found: Meeting ran late</span>}
-                  {simStep === 2 && <span className="text-indigo-400">Fixed: Schedule rebalanced smoothly</span>}
-                </div>
+              {/* Status Note Area */}
+              <div className="p-3 rounded-xl border border-zinc-900 bg-black/40 space-y-1">
+                <span className="text-[10px] text-indigo-400 font-mono uppercase tracking-wider block">Engine Feedback</span>
+                <p className="text-xs text-zinc-400">
+                  {simStep === 0 && "Everything fits cleanly into your afternoon schedule."}
+                  {simStep === 1 && "An unexpected afternoon delay has over-crowded today."}
+                  {simStep === 2 && "Low urgency tasks gracefully slid to tomorrow. Peace restored."}
+                </p>
               </div>
             </div>
 
-            {/* Right Box: Live Visual Schedule Transformation */}
-            <div className="lg:col-span-8 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-400 font-medium">Your Dynamic Daily Agenda</span>
-                  <span className="text-[11px] text-zinc-600">Live View</span>
+            {/* Right Box: The Changing Task List */}
+            <div className="lg:col-span-8 space-y-3">
+              <div className="flex items-center justify-between text-xs text-zinc-500">
+                <span>Today's Intelligent Agenda</span>
+                <span className="font-mono text-[10px]">Step {simStep + 1} of 3</span>
+              </div>
+
+              <div className="space-y-2.5">
+                {/* Protected/High-Priority Task */}
+                <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/20 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                    <div>
+                      <p className="text-xs text-zinc-200 font-medium">Review contract proposal draft</p>
+                      <p className="text-[10px] text-zinc-500">Takes 2 hours • Critical Importance</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] bg-red-950/40 text-red-300 px-2 py-0.5 rounded border border-red-900/30">Locked</span>
                 </div>
 
-                <div className="space-y-2.5">
-                  {/* Task Item 1 */}
-                  <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-900/30 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 size={16} className="text-zinc-600" />
-                      <div>
-                        <p className="text-xs text-zinc-400 line-through">Draft descriptions for services and pricing</p>
-                        <p className="text-[10px] text-zinc-600">Done this morning</p>
+                {/* Shifting Task Instance */}
+                <AnimatePresence mode="wait">
+                  {simStep === 0 && (
+                    <motion.div key="state0" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Clock size={14} className="text-zinc-500" />
+                        <div>
+                          <p className="text-xs text-zinc-300">Clean garage & box old equipment</p>
+                          <p className="text-[10px] text-zinc-500">Takes 1 hour • Flexible Importance</p>
+                        </div>
                       </div>
-                    </div>
-                    <span className="text-[10px] bg-zinc-900 px-2 py-0.5 rounded text-zinc-500">High Focus</span>
-                  </div>
+                      <span className="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">Scheduled</span>
+                    </motion.div>
+                  )}
 
-                  {/* Task Item 2 - The Variable State Item */}
-                  <AnimatePresence mode="wait">
-                    {simStep === 0 && (
-                      <motion.div key="step0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-3 rounded-xl border border-zinc-800 bg-zinc-900/60 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Clock size={16} className="text-zinc-400 animate-pulse" />
-                          <div>
-                            <p className="text-xs text-zinc-200 font-medium">Select portfolio images & write case studies</p>
-                            <p className="text-[10px] text-zinc-400">Scheduled: Today, 2:00 PM</p>
-                          </div>
+                  {simStep === 1 && (
+                    <motion.div key="state1" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="p-3.5 rounded-xl border border-red-900/40 bg-red-950/10 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <AlertCircle size={14} className="text-red-400 animate-bounce" />
+                        <div>
+                          <p className="text-xs text-red-200 font-medium">Clean garage & box old equipment</p>
+                          <p className="text-[10px] text-red-400">Conflict: Day has run out of time</p>
                         </div>
-                        <span className="text-[10px] bg-indigo-950 border border-indigo-900 text-indigo-300 px-2 py-0.5 rounded-full px-2">Important</span>
-                      </motion.div>
-                    )}
-
-                    {simStep === 1 && (
-                      <motion.div key="step1" initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-3 rounded-xl border border-amber-900/50 bg-amber-950/20 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <AlertCircle size={16} className="text-amber-500" />
-                          <div>
-                            <p className="text-xs text-amber-200 font-medium">Select portfolio images & write case studies</p>
-                            <p className="text-[10px] text-amber-500 font-medium">Missed: Urgent phone call took over your afternoon</p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] bg-amber-900 text-amber-200 px-2 py-0.5 rounded">Unfinished</span>
-                      </motion.div>
-                    )}
-
-                    {simStep === 2 && (
-                      <motion.div key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-xl border border-emerald-900/50 bg-emerald-950/20 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle2 size={16} className="text-emerald-400" />
-                          <div>
-                            <p className="text-xs text-emerald-200 font-medium">Select portfolio images & write case studies</p>
-                            <p className="text-[10px] text-emerald-400 font-medium">✨ Automatically moved to Tomorrow at 9:00 AM (Free space found)</p>
-                          </div>
-                        </div>
-                        <span className="text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded">Rescheduled</span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Task Item 3 */}
-                  <div className="p-3 rounded-xl border border-zinc-900 bg-zinc-950/40 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full border border-zinc-800" />
-                      <div>
-                        <p className="text-xs text-zinc-500">Send contract template to new client for sign-off</p>
-                        <p className="text-[10px] text-zinc-600">Waiting for open slot</p>
                       </div>
+                      <span className="text-[10px] bg-red-900 text-white px-2 py-0.5 rounded">Overflow</span>
+                    </motion.div>
+                  )}
+
+                  {simStep === 2 && (
+                    <motion.div key="state2" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="p-3.5 rounded-xl border border-emerald-900/30 bg-emerald-950/10 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 size={14} className="text-emerald-400" />
+                        <div>
+                          <p className="text-xs text-emerald-300">Clean garage & box old equipment</p>
+                          <p className="text-[10px] text-emerald-400">✨ Safely moved to tomorrow morning when you have space</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] bg-emerald-900/40 text-emerald-300 px-2 py-0.5 rounded">Balanced</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Aging Task Catch-up Highlight */}
+                <div className="p-3.5 rounded-xl border border-zinc-900 bg-zinc-950 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <History size={14} className="text-indigo-400" />
+                    <div>
+                      <p className="text-xs text-zinc-400">Call back home insurance provider</p>
+                      <p className="text-[10px] text-zinc-500">Bumped twice before • Urgency naturally increased so you don't forget it</p>
                     </div>
-                    <span className="text-[10px] bg-zinc-900 px-2 py-0.5 rounded text-zinc-600">Quick Task</span>
                   </div>
+                  <span className="text-[10px] bg-indigo-950/60 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900/40">Priority Boosted</span>
                 </div>
+
               </div>
             </div>
           </div>
         </motion.div>
       </section>
 
-      {/* 3. PROBLEM SECTION */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+      {/* 4. THE CORE EXPERIENCE PROBLEM */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5 space-y-4">
-            <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">The Productivity Trap</div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-              Planning isn't the hard part. Staying on track is.
+            <div className="text-xs font-semibold uppercase tracking-widest text-zinc-500">The Core Friction</div>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
+              To-do lists treat you like a machine.
             </h2>
-            <p className="text-zinc-400 leading-relaxed text-sm sm:text-base">
-              Traditional to-do lists expect you to be a robot. The second you get an urgent call, hit traffic, or just run out of steam, your calendar fills up with a pile of past-due notifications. Eventually, you feel overwhelmed and give up entirely.
+            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
+              Traditional productivity software expects perfectly static days. But when real life drops an emergency call or an erratic work block into your afternoon, those lists immediately break. You are met with stressful past-due red marks and a pile of boxes you must manually fix.
             </p>
           </div>
 
-          <div className="lg:col-span-7 bg-gradient-to-br from-zinc-950 to-zinc-900 p-6 rounded-2xl border border-zinc-800/60 relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-zinc-500 border-b border-zinc-800 pb-2">
-                <span>Standard To-Do Lists vs. Reality</span>
-                <span className="text-red-400 font-bold">● Overloaded</span>
+          <div className="lg:col-span-7 bg-zinc-950 border border-zinc-900 p-6 rounded-2xl relative">
+            <div className="space-y-3 opacity-50 select-none pointer-events-none filter blur-[0.4px]">
+              <div className="p-3 bg-red-950/20 border border-red-900/30 rounded-xl text-xs text-red-300 flex justify-between">
+                <span>[Monday] Draft program itinerary</span>
+                <span className="text-[10px] bg-red-900 px-1.5 py-0.5 rounded text-white font-bold">OVERDUE</span>
               </div>
-              <div className="space-y-3 opacity-60 filter blur-[0.5px]">
-                <div className="p-2.5 bg-red-950/20 border border-red-900/30 rounded-lg text-xs text-red-300 flex items-center justify-between">
-                  <span><s>[Monday] Finish client proposal draft</s></span>
-                  <span className="text-[10px] text-red-400 bg-red-950 px-1.5 py-0.5 rounded">OVERDUE</span>
-                </div>
-                <div className="p-2.5 bg-red-950/20 border border-red-900/30 rounded-lg text-xs text-red-300 flex items-center justify-between">
-                  <span><s>[Tuesday] Outline presentation talking points</s></span>
-                  <span className="text-[10px] text-red-400 bg-red-950 px-1.5 py-0.5 rounded">OVERDUE</span>
-                </div>
-                <div className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-500">
-                  [Wednesday] Research new software options
-                </div>
+              <div className="p-3 bg-red-950/20 border border-red-900/30 rounded-xl text-xs text-red-300 flex justify-between">
+                <span>[Tuesday] Research vehicle options</span>
+                <span className="text-[10px] bg-red-900 px-1.5 py-0.5 rounded text-white font-bold">OVERDUE</span>
               </div>
-              <p className="text-xs text-zinc-400 italic bg-zinc-900/50 p-3 rounded-lg text-center border border-zinc-800">
-                ⚠️ You have 5 missed tasks dragging from earlier this week. Your schedule is no longer realistic.
-              </p>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center p-4">
+              <div className="bg-zinc-900 text-zinc-200 border border-zinc-800 rounded-xl p-4 text-xs max-w-sm text-center shadow-xl space-y-1">
+                <span className="font-semibold text-white block">Stratos approaches this differently:</span>
+                <span>Missed tasks quietly distribute into tomorrow's open capacity slots automatically. No guilt. No mess.</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. SOLUTION OVERVIEW */}
-      <section id="features" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Built for execution, not just organization.</h2>
-          <p className="text-zinc-400 max-w-xl mx-auto text-sm sm:text-base">We divided the workload of your day into two intelligent systems.</p>
+      {/* 5. FOUR SPEC-DRIVEN FEATURES */}
+      <section id="features" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+        <div className="text-center space-y-3 mb-16">
+          <h2 className="text-3xl font-bold text-white">Smarter coordination without the technical complex.</h2>
+          <p className="text-zinc-400 max-w-xl mx-auto text-xs sm:text-sm">We engineered the calendar framework to handle the heavy balancing for you.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="p-8 rounded-2xl bg-gradient-to-b from-zinc-900/80 to-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
-                <Brain size={20} />
-              </div>
-              <h3 className="text-xl font-semibold text-white">The Smart Planning Engine</h3>
-              <p className="text-zinc-400 text-sm leading-relaxed">
-                Tell the platform what you want to achieve in plain English. Powered by Claude, it deeply understands your personal context, preferred pacing, and deadlines to turn a massive goal into simple, bite-sized daily steps.
-              </p>
+          {/* Capacity Aware Engine */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950 border border-zinc-900 hover:border-zinc-800 transition-colors space-y-4">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <Sliders size={18} />
             </div>
-            <div className="pt-4 border-t border-zinc-900 text-xs text-zinc-500">
-              Handles: Big Goals • Step-by-Step Roadmaps • Daily Milestones
-            </div>
-          </div>
-
-          <div className="p-8 rounded-2xl bg-gradient-to-b from-zinc-900/80 to-zinc-950 border border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
-                <Sliders size={20} />
-              </div>
-              <h3 className="text-xl font-semibold text-white">The Auto-Rescheduling Engine</h3>
-              <p className="text-zinc-400 text-sm leading-relaxed">
-                Your safety net for when life gets busy. It constantly looks out for you—smoothly moving uncompleted work into optimal future slots, saving your important deadlines, and keeping your daily stress levels down.
-              </p>
-            </div>
-            <div className="pt-4 border-t border-zinc-900 text-xs text-zinc-500">
-              Protects: Overdue Tasks • Energy Balances • Hard Deadlines
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. FEATURE GRID */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-          <div className="md:col-span-2 p-6 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="text-base font-semibold text-white">Goal-to-Plan Generator</h4>
-              <p className="text-xs text-zinc-400 mt-1">Type in a major goal—like writing a book or building a business. The AI handles the overwhelming thinking process and creates a manageable execution timeline for you.</p>
-            </div>
-            <div className="bg-zinc-900/40 p-3 rounded-lg border border-zinc-900 text-[11px] text-indigo-300">
-              ✨ Turning "Write a 5,000 word proposal" into 6 small, daily tasks...
-            </div>
-          </div>
-
-          <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="text-base font-semibold text-white">Context-Aware Realities</h4>
-              <p className="text-xs text-zinc-400 mt-1">The system respects your actual life. It remembers your child-care blocks, vacations, routine breaks, and energy limits.</p>
-            </div>
-            <span className="text-[11px] text-zinc-600">Personal settings synced</span>
-          </div>
-
-          <div className="p-6 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="text-base font-semibold text-white">Smart Auto-Rescheduling</h4>
-              <p className="text-xs text-zinc-400 mt-1">Unfinished items slide gracefully to upcoming open windows. You never have to manually shift calendar boxes again.</p>
-            </div>
-            <div className="h-2 w-full bg-zinc-900 rounded-full overflow-hidden">
-              <motion.div animate={{ width: ['20%', '85%', '20%'] }} transition={{ duration: 6, repeat: Infinity }} className="h-full bg-indigo-500" />
-            </div>
-          </div>
-
-          <div className="md:col-span-2 p-6 rounded-xl bg-zinc-950 border border-zinc-800 flex flex-col justify-between space-y-4">
-            <div>
-              <h4 className="text-base font-semibold text-white">Priority-Based Workload Recovery</h4>
-              <p className="text-xs text-zinc-400 mt-1">Your absolute highest-priority projects always get preferred spots in your calendar. If a shift happens, lower-priority tasks give way automatically to protect your main goals.</p>
-            </div>
-            <div className="flex gap-2">
-              <span className="px-2 py-0.5 rounded text-[10px] bg-red-950 text-red-300 border border-red-900/40">Critical Priority</span>
-              <span className="px-2 py-0.5 rounded text-[10px] bg-zinc-900 text-zinc-400">Flexible Task</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 6. DEEP DIVE: SMART PLANNING ENGINE */}
-      <section id="how-it-works" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900 relative">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5 space-y-5">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-indigo-950/50 border border-indigo-900 text-xs text-indigo-300">
-              Phase 01 // From Goal to Action
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">More context. Better plans.</h2>
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-              Standard AI tools give you a generic list because they don't know who you are. Stratos takes your goals and blends them with your actual life constraints—your available hours, energy patterns, and existing plans—to build a roadmap that actually works.
-            </p>
-
-            {/* Structured Workflow Micro-Stepper */}
-            <div className="space-y-3 text-xs text-zinc-400 pt-2">
-              <div className="flex items-center gap-3"><span className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] text-zinc-300">1</span> You type in a goal or milestone</div>
-              <div className="flex items-center gap-3"><span className="w-5 h-5 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[10px] text-zinc-300">2</span> The system checks your available hours</div>
-              <div className="flex items-center gap-3"><span className="w-5 h-5 rounded-full bg-indigo-950 border border-indigo-800 flex items-center justify-center text-[10px] text-indigo-300">3</span> Claude creates custom, step-by-step tasks</div>
-            </div>
-          </div>
-
-          {/* Graphical Pipeline Representation */}
-          <div className="lg:col-span-7 bg-zinc-950 border border-zinc-800 p-6 rounded-2xl relative">
-            <div className="space-y-4 text-xs">
-              <div className="p-3 rounded-lg bg-zinc-900/50 border border-zinc-800 text-zinc-400 flex justify-between">
-                <span>📥 Your Input</span>
-                <span className="text-zinc-200">"Build a 4-week fitness routine & prep meals"</span>
-              </div>
-              <div className="flex justify-center my-2"><div className="w-px h-6 bg-gradient-to-b from-indigo-500 to-transparent" /></div>
-              <div className="p-3 rounded-lg bg-indigo-950/20 border border-indigo-900/50 text-indigo-200 flex items-center gap-3">
-                <Brain size={14} className="text-indigo-400 shrink-0" />
-                <span>Stratos is analyzing your calendar, free evenings, and gym equipment preference...</span>
-              </div>
-              <div className="flex justify-center my-2"><div className="w-px h-6 bg-gradient-to-b from-purple-500 to-transparent" /></div>
-              <div className="p-3 rounded-lg bg-zinc-900/50 border border-zinc-800 space-y-2">
-                <span className="text-emerald-400 text-[11px]">✓ Your Customized Plan Ready:</span>
-                <div className="pl-3 border-l border-zinc-800 space-y-1.5 text-zinc-400 text-[11px]">
-                  <div>• Monday: 30-minute upper body circuit [Set for 6:00 PM free window]</div>
-                  <div>• Tuesday: Grocery shop for high-protein ingredients [Set for lunch break]</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. DEEP DIVE: SMART RESCHEDULING ENGINE */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-
-          <div className="lg:col-span-7 order-last lg:order-first bg-zinc-950 border border-zinc-800 p-6 rounded-2xl">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs text-zinc-500">
-                <span>Behind the Scenes: Rebalancing Logic</span>
-                <span className="text-purple-400">Smart Balancing</span>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="p-3 bg-zinc-900/60 rounded-lg flex justify-between items-center">
-                  <span className="text-zinc-300">How important is this task?</span>
-                  <span className="text-indigo-400">High priority (Must do this week)</span>
-                </div>
-                <div className="p-3 bg-zinc-900/60 rounded-lg flex justify-between items-center">
-                  <span className="text-zinc-300">How many days overdue?</span>
-                  <span className="text-amber-400">Missed yesterday</span>
-                </div>
-                <div className="p-3 bg-zinc-900/60 rounded-lg flex justify-between items-center">
-                  <span className="text-zinc-300">Your available capacity</span>
-                  <span className="text-emerald-400">You have 2 hours open tomorrow morning</span>
-                </div>
-              </div>
-
-              <div className="p-3 bg-purple-950/20 border border-purple-900/40 rounded-lg text-xs text-center text-purple-300">
-                ✨ Action Taken: Task safely moved to tomorrow morning. Lower priority items shifted back to keep you stress-free.
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 space-y-5">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-950/50 border border-purple-900 text-xs text-purple-300">
-              Phase 02 // Automatic Adaptation
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">When life happens, the system adapts.</h2>
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-              If an emergency cuts your afternoon short or a meeting runs late, you don't have to panic. Stratos instantly calculates the best path forward—rearranging your upcoming week based on what matters most, preserving your hard deadlines, and keeping you moving forward.
+            <h3 className="text-lg font-semibold text-white">Dynamic Time Budgets</h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              Set how many hours you realistically have available each day. As you create tasks or add items, the schedule builds boundaries. If a shift pushes things beyond your budget, lower-priority tasks gracefully cascade forward to tomorrow.
             </p>
           </div>
 
+          {/* Claude Custom Hookup (MCP) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950 border border-zinc-900 hover:border-zinc-800 transition-colors space-y-4">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <Brain size={18} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Personal Assistant Connection</h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              Link the system straight to your own personal Claude account. Ask it to blueprint an entire timeline—like a 4-week workout routine or an exam preparation sequence. It reads your available space and maps out every step instantly.
+            </p>
+          </div>
+
+          {/* Aging Task Urgency */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950 border border-zinc-900 hover:border-zinc-800 transition-colors space-y-4">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Layers size={18} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">The Catch-Up Equalizer</h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              To prevent small tasks from being permanently pushed to the back burner, the system tracks how often a task gets moved. Every time an item is shifted forward, it naturally gains priority weight so it eventually secures a locked spot.
+            </p>
+          </div>
+
+          {/* The Graveyard (Needs Review Safety Net) */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-zinc-950 border border-zinc-900 hover:border-zinc-800 transition-colors space-y-4">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <Compass size={18} />
+            </div>
+            <h3 className="text-lg font-semibold text-white">The "Needs Review" Safety Net</h3>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+              If a task gets delayed three times, it stops moving. Instead of endlessly dragging forward and creating a daily wall of clutter, Stratos quietly places it into a specific review tray so you can reset, change details, or drop it altogether.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* 8. HOW IT WORKS (THE WORKFLOW LOOP) */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
-        <div className="text-center max-w-xl mx-auto space-y-4 mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-white">A simpler way to run your day</h2>
-          <p className="text-zinc-400 text-sm">How Stratos keeps your life completely in sync.</p>
+      {/* 6. HOW IT WORKS FLOW STEPPER */}
+      <section id="how-it-works" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+        <div className="text-center max-w-xl mx-auto space-y-3 mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white">A seamless, continuous cycle</h2>
+          <p className="text-zinc-400 text-xs sm:text-sm">How Stratos coordinates your daily roadmap safely.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { step: "01", title: "Set Your Goals", desc: "Type out what you want to achieve, whether it's personal, creative, or professional." },
-            { step: "02", title: "AI Creates the Plan", desc: "Our Claude-driven assistant breaks your goal down into clear, small daily steps." },
-            { step: "03", title: "Review Your Roadmap", desc: "Make adjustments, lock in specific meetings, or leave things flexible." },
-            { step: "04", title: "Follow Your Daily Flow", desc: "Log in each morning to see a clean, realistic schedule designed for your day." },
-            { step: "05", title: "Automatic Balancing", desc: "If you miss something, don't worry. The engine automatically reschedules it." },
-            { step: "06", title: "Refine Your Pacing", desc: "The platform learns how you work best, making future plans even more accurate." }
-          ].map((item, index) => (
-            <div key={index} className="p-5 rounded-xl bg-zinc-950 border border-zinc-900 hover:border-zinc-800 transition-colors space-y-3">
-              <span className="text-xs text-indigo-500 font-bold">{item.step}</span>
-              <h4 className="text-base font-semibold text-white">{item.title}</h4>
+            { step: "01", title: "Set Free Hours", desc: "Define your daily capacity thresholds—like 2 hours for side projects or 6 hours for focused work." },
+            { step: "02", title: "Blueprint Goals", desc: "Describe major objectives inside your own assistant window to generate structured task lists instantly." },
+            { step: "03", title: "Execute Stress-Free", desc: "Work from a clean view showing only what comfortably fits inside today's open timeframe." },
+            { step: "04", title: "Auto Rebalance", desc: "If anything drops off, the balancing engine shifts items forward at midnight to keep tomorrow clear." }
+          ].map((item, idx) => (
+            <div key={idx} className="p-5 rounded-xl bg-zinc-950 border border-zinc-900 space-y-3 relative">
+              <span className="font-mono text-xs text-indigo-400 font-bold block">{item.step}</span>
+              <h4 className="text-sm font-semibold text-white">{item.title}</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 9. SOCIAL PROOF SECTION */}
-      <section id="reviews" className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
+      {/* 7. SOCIAL PROOF ARCHIVE */}
+      <section id="reviews" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
         <div className="text-center space-y-2 mb-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Loved by busy, high-achieving people</h2>
-          <p className="text-zinc-500 text-sm">See how much time our community is reclaiming every week.</p>
+          <h2 className="text-2xl font-bold text-white">Designed for realistic paces</h2>
+          <p className="text-zinc-500 text-xs sm:text-sm">Reclaim hours spent manually restructuring calendars.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, idx) => (
-            <div key={idx} className="p-6 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col justify-between space-y-6">
+            <div key={idx} className="p-6 rounded-xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between space-y-6">
               <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed italic">"{t.quote}"</p>
               <div className="flex items-center justify-between pt-4 border-t border-zinc-900">
                 <div>
                   <h5 className="text-xs font-bold text-white">{t.author}</h5>
                   <p className="text-[10px] text-zinc-500">{t.role}</p>
                 </div>
-                <span className="text-[11px] font-medium text-emerald-400 bg-emerald-950/30 px-2 py-0.5 rounded border border-emerald-900/30">
+                <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-900/30">
                   {t.metric}
                 </span>
               </div>
@@ -517,22 +394,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 10. FAQ SECTION */}
-      <section id="faq" className="py-24 max-w-3xl mx-auto px-4 sm:px-6 border-b border-zinc-900">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-12">Frequently Asked Questions</h2>
+      {/* 8. PLAIN ENGLISH FAQ ACCORDION */}
+      <section id="faq" className="py-20 max-w-3xl mx-auto px-4 sm:px-6 border-b border-zinc-900">
+        <h2 className="text-2xl font-bold text-center text-white mb-10">Frequently Answered</h2>
 
         <div className="space-y-4">
           {faqs.map((faq, i) => (
-            <div key={i} className="border border-zinc-800 rounded-xl bg-zinc-950 overflow-hidden">
+            <div key={i} className="border border-zinc-900 rounded-xl bg-zinc-950 overflow-hidden">
               <button onClick={() => setActiveFaq(activeFaq === i ? null : i)} className="w-full p-5 text-left flex items-center justify-between text-zinc-200 hover:text-white transition-colors">
-                <span className="text-sm font-medium">{faq.q}</span>
-                <ChevronDown size={16} className={`transform transition-transform text-zinc-500 ${activeFaq === i ? 'rotate-180 text-white' : ''}`} />
+                <span className="text-xs sm:text-sm font-medium">{faq.q}</span>
+                <ChevronDown size={14} className={`transform transition-transform text-zinc-500 ${activeFaq === i ? 'rotate-180 text-white' : ''}`} />
               </button>
 
               <AnimatePresence>
                 {activeFaq === i && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="border-t border-zinc-900 bg-black/40">
-                    <p className="p-5 text-xs sm:text-sm text-zinc-400 leading-relaxed">{faq.a}</p>
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="border-t border-zinc-900/60 bg-black/20">
+                    <p className="p-5 text-xs text-zinc-400 leading-relaxed">{faq.a}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -541,32 +418,35 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 11. FINAL CALL TO ACTION */}
-      <section className="py-24 max-w-5xl mx-auto px-4 sm:px-6 text-center relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.06),transparent_50%)] pointer-events-none" />
+      {/* 9. PREMIUM CALL TO ACTION BLOCK */}
+      <section className="py-20 max-w-5xl mx-auto px-4 sm:px-6 text-center relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.04),transparent_50%)] pointer-events-none" />
 
-        <div className="bg-gradient-to-b from-zinc-900 to-black border border-zinc-800 p-8 sm:p-12 rounded-3xl space-y-6 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+        <div className="bg-gradient-to-b from-zinc-950 to-black border border-zinc-900 p-8 sm:p-12 rounded-2xl space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
 
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
-            Build a plan once. <br />Let the system keep it realistic.
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
+            Stop forcing your life into static lists.
           </h2>
-          <p className="text-zinc-400 text-sm sm:text-base max-w-xl mx-auto">
-            Stop losing hours fixing broken calendars and feeling guilty about missed tasks. Let smart planning outline your roadmap, and let dynamic rebalancing keep your days clear and organized.
+          <p className="text-zinc-400 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
+            Let your favorite assistant draft your plans, and let our capacity-aware balancing engine keep your daily agenda achievable and calm.
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/register" className="h-12 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-sm tracking-tight transition-all shadow-xl flex items-center justify-center">
-              Start Planning Free
+            <Link href="/register" className="h-11 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs tracking-tight transition-all shadow-xl flex items-center justify-center">
+              Create Your Account Free
             </Link>
-            <span className="text-xs text-zinc-500">No credit card required.</span>
+            <div className="flex items-center gap-1 text-[11px] text-zinc-500">
+              <ShieldCheck size={12} className="text-zinc-400" />
+              Connected via your personal assistant
+            </div>
           </div>
         </div>
       </section>
 
-      {/* MINI FOOTER */}
-      <footer className="border-t border-zinc-900 bg-black py-8 text-center text-xs text-zinc-600">
-        <div>© {new Date().getFullYear()} STRATOS INC. ALL RIGHTS RESERVED. PRIVACY PROTECTED.</div>
+      {/* MINIMAL FOOTER */}
+      <footer className="border-t border-zinc-900 bg-black py-8 text-center text-[10px] text-zinc-600 tracking-wider">
+        <div>© {new Date().getFullYear()} STRATOS INC. CAPACITY DRIVEN TASK PROTECTION. ALL PRIVACY RESERVED.</div>
       </footer>
 
     </div>

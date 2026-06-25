@@ -1,2 +1,3 @@
 export { Sidebar } from './components/Sidebar';
-export * from './utils/formatter'
+export { AppLayout } from './components/AppLayout';
+export * from './utils/formatter';

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Sidebar } from '@/features/tasks/components/Sidebar'
 import { useGraveyardTasks } from '@/features/tasks/api/use-tasks'
 import type { Task } from '@/features/tasks/types'
 import { GraveyardCard } from '@/features/tasks/components/GraveyardCard'
@@ -148,13 +147,7 @@ export default function GraveyardPage() {
   }, null)
 
   return (
-    <div className={`flex min-h-screen font-sans antialiased ${t.page}`}>
-      {/* Sidebar */}
-      <div className="sticky top-0 h-screen bg-white border-r border-[#2d2d2d]">
-        <Sidebar />
-      </div>
-
-      <div className="flex-1 selection:bg-purple-500/20">
+    <div className={`min-h-screen font-sans antialiased ${t.page}`}>
         {/* ── Header ── */}
         <header className={`sticky top-0 z-40 border-b pt-6 pb-0 px-8 ${t.header}`}>
           <div className="max-w-3xl mx-auto">
@@ -269,7 +262,6 @@ export default function GraveyardPage() {
             </div>
           )}
         </main>
-      </div>
     </div>
   )
-}
+}
