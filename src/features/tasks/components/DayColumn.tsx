@@ -79,12 +79,12 @@ export function DayColumn({ date }: DayColumnProps) {
             {main}
           </h2>
           {sub && (
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+            <p className={`text-sm mt-0.5 ${t.subheading}`}>
               {sub}
             </p>
           )}
         </div>
-        <div className={`px-3 py-1 text-xs font-medium rounded-full ${t.bg} text-neutral-500 dark:text-neutral-400 ${t.border}`}>
+        <div className={`px-3 py-1 text-xs font-medium rounded-full border ${t.bg} ${t.subheading} ${t.border}`}>
           {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </div>
       </div>
@@ -98,7 +98,7 @@ export function DayColumn({ date }: DayColumnProps) {
       {isLoading && (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-neutral-200 dark:bg-neutral-800 rounded-2xl animate-pulse" />
+            <div key={i} className={`h-20 rounded-2xl animate-pulse ${t.skeleton}`} />
           ))}
         </div>
       )}
@@ -123,7 +123,7 @@ export function DayColumn({ date }: DayColumnProps) {
           {/* Pending section */}
           <div className="flex-1">
             {pending.length > 0 && (
-              <div className="uppercase tracking-[0.075em] text-[10px] font-semibold text-neutral-500 dark:text-neutral-400 mb-3 pl-1">
+              <div className={`uppercase tracking-[0.075em] text-[10px] font-semibold mb-3 pl-1 ${t.subheading}`}>
                 Pending
               </div>
             )}
@@ -131,8 +131,8 @@ export function DayColumn({ date }: DayColumnProps) {
             <div className="space-y-2.5" role="list">
               {pending.length === 0 && !isAdding && (
                 <div>
-                  <p className="text-neutral-400 dark:text-neutral-500 font-medium">No pending tasks</p>
-                  <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">Add one below to get started</p>
+                  <p className={`font-medium ${t.emptyBody}`}>No pending tasks</p>
+                  <p className={`text-sm mt-1 ${t.body}`}>Add one below to get started</p>
                 </div>
               )}
 
@@ -166,10 +166,10 @@ export function DayColumn({ date }: DayColumnProps) {
             {!isAdding && (
               <button
                 onClick={openShell}
-                className="mt-5 w-full group flex items-center justify-center gap-2.5 py-3.5 px-5 border border-dashed border-neutral-300 dark:border-neutral-700 hover:border-blue-500 dark:hover:border-blue-400 rounded-2xl text-neutral-500 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className={`mt-5 w-full group flex items-center justify-center gap-2.5 py-3.5 px-5 border border-dashed rounded-2xl text-[13px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1a6bff]/40 focus:ring-offset-2 ${tt.actionBtn}`}
                 aria-label={`Add task for ${main}`}
               >
-                <div className="w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900 flex items-center justify-center transition-colors">
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${tt.chipDuration}`}>
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
@@ -185,7 +185,7 @@ export function DayColumn({ date }: DayColumnProps) {
           {/* Completed */}
           {completed.length > 0 && (
             <details className="mt-8 group">
-              <summary className="flex items-center gap-2.5 text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer py-2 select-none list-none hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors">
+              <summary className={`flex items-center gap-2.5 text-sm cursor-pointer py-2 select-none list-none transition-colors ${t.subheading} ${t.back}`}>
                 <div className="w-4 h-4 flex items-center justify-center transition-transform group-open:rotate-90">
                   <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

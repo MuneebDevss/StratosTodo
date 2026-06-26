@@ -20,7 +20,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const t = PAGE_THEME[theme];
 
   return (
-    <div className={`flex min-h-screen ${t.bg} text-neutral-900 dark:text-white transition-colors duration-150`}>
+    <div className={`flex min-h-screen ${t.bg} ${t.heading} transition-colors duration-150`}>
       <Sidebar />
       <main className="flex-1 min-w-0 relative">
         {children}

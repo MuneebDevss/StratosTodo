@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "Advanced dynamic task management engine.",
 };
 
+const themeInitScript = `(function(){try{var t=localStorage.getItem('stratostodo:theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,8 +29,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <Providers>
           <AppLayout>

@@ -7,6 +7,7 @@ import { isToday, formatSectionHeading } from '../utils/format'
 import { useCreateTask, useUpdateTask } from '../api/use-tasks'
 import { DaySectionProps, DropZoneProps, EditFields } from '../types'
 import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
+import { useTheme } from '@/features/settings/hooks/use-theme'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -85,7 +86,9 @@ function DropZone({ date, theme, children }: DropZoneProps) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
-  ({ group, theme = 'dark' }, ref) => {
+  ({ group, theme: themeProp }, ref) => {
+    const { theme: contextTheme } = useTheme()
+    const theme = themeProp ?? contextTheme
     const heading = formatSectionHeading(group.date)
     const today = isToday(group.date)
     const t = TASK_THEMES[theme]
@@ -131,8 +134,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
         {/* Section heading */}
         <div
           ref={ref}
-          className={`text-[13px] font-medium mb-2 py-1 ${today ? 'text-[#1a6bff]' : 'text-[#9898a8]'
-            }`}
+          className={`text-[13px] font-medium mb-2 py-1 ${today ? 'text-[#1a6bff]' : t.description}`}
           data-date={group.date}
         >
           {heading}
@@ -142,7 +144,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
         <DropZone date={group.date} theme={theme}>
           {/* Task list */}
           {group.tasks.length === 0 && !isAdding ? (
-            <div className="flex items-center gap-2 py-2 text-[13px] text-[#9898a8] mb-4">
+            <div className={`flex items-center gap-2 py-2 text-[13px] mb-4 ${t.description}`}>
               Nothing scheduled
             </div>
           ) : (
@@ -178,7 +180,7 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
         {/* Add task button — hidden while shell is open */}
         {!isAdding && (
           <button
-            className="flex items-center gap-2 px-3.5 py-2.5 border-[1.5px] border-dashed border-[#e8e8ec] rounded-[10px] text-[#9898a8] text-[13px] cursor-pointer bg-transparent w-full mb-6 transition-[border-color,color] duration-150 hover:border-[#1a6bff] hover:text-[#1a6bff]"
+            className={`flex items-center gap-2 px-3.5 py-2.5 border-[1.5px] border-dashed rounded-[10px] text-[13px] cursor-pointer bg-transparent w-full mb-6 transition-[border-color,color] duration-150 ${t.actionBtn}`}
             onClick={openShell}
             aria-label={`Add task for ${heading}`}
           >
