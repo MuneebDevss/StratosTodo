@@ -23,7 +23,6 @@ export const PAGE_THEME = {
     bg: 'bg-[#f5f5f7]',
     panelBg: 'bg-white',
     border: 'border-[#e8e8ec]/50',
-    divider: 'border-[#e8e8ec]',
 
     // Typography
     heading: 'text-[#1a1a2e]',
@@ -42,17 +41,51 @@ export const PAGE_THEME = {
     sidebarActiveBg: 'bg-[#fce8e6]',
     sidebarActiveText: 'text-[#e8453c]',
 
+
+    //Skeleton
+    skeleton: 'bg-[#e8e8ec]/50',
+    emptyTitle: 'text-[#1a1a2e]',
+    emptyBody: 'text-[#6b6b80]',
+
     // Shared action tokens
     deleteBtn: 'border-[#e8e8ec]/50 bg-white text-[#c94020] hover:bg-[#fff0ed] hover:border-[#f5c0b0]',
     navBtn: 'bg-[#f5f5f7] border-[#e8e8ec]/50 text-[#6b6b80] hover:bg-[#e8e8f0]',
     datePill: 'bg-[#f5f5f7] border-[#e8e8ec]/50 text-[#6b6b80]',
+
+    page: 'bg-[#f7f6f3] text-[#2a2a3a]',
+    header: 'bg-[#f7f6f3] border-[#e4e2de]',
+    card: 'bg-white border-[#e8e6e0] hover:border-[#d4d0c8] hover:bg-[#fefefe]',
+    cardTitle: 'text-[#6b6878] line-through decoration-[#c0bcc8] decoration-1',
+    cardMeta: 'text-[#9090a8]',
+    cardAge: 'text-[#a8a4b8] bg-[#f4f2f0] border border-[#e4e0da]',
+    badge: {
+      high: 'bg-[#fdf0ee] text-[#b04030] border border-[#f0c8c0]',
+      medium: 'bg-[#fdf8ee] text-[#906020] border border-[#f0dca0]',
+      low: 'bg-[#eef3fc] text-[#3060a0] border border-[#c0d4f0]',
+    },
+    divider: 'bg-[#ece9e4]',
+    emptyIcon: 'text-[#dcd8d0]',
+    emptyText: 'text-[#b0a8c0]',
+    emptySubtext: 'text-[#c8c4d0]',
+    btnRedate: 'bg-[#f0eeff] text-[#5a40c0] border border-[#d0c8f0] hover:bg-[#e8e4ff] hover:text-[#4830a8] hover:border-[#b8aee8]',
+    btnComplete: 'bg-[#eef8f2] text-[#2a7848] border border-[#b8e4cc] hover:bg-[#e4f4ea] hover:text-[#1a6038] hover:border-[#90d0a8]',
+    btnDelete: 'bg-[#fef0f0] text-[#a83028] border border-[#f0c0b8] hover:bg-[#fce8e6] hover:text-[#901e18] hover:border-[#e8a099]',
+    datePicker: 'bg-white border-[#e0dcd8] text-[#2a2a3a]',
+    dateInput: 'bg-[#f8f7f5] border-[#e0dcd8] text-[#2a2a3a] focus:border-[#7060d0]',
+    dateConfirm: 'bg-[#5a40c0] text-white hover:bg-[#4830a8]',
+    dateCancel: 'bg-[#f0ede8] text-[#8080a0] hover:bg-[#e8e4e0]',
+    statsBar: 'bg-white border-[#e8e4de]',
+    statsLabel: 'text-[#b0a8b8]',
+    statsValue: 'text-[#7070a0]',
+    tabActive: 'bg-[#f0eeff] text-[#5a40c0] border border-[#d0c8f0]',
+    tabInactive: 'text-[#a0a0b8] hover:text-[#5a5a78] hover:bg-[#eeecf0]',
+    countPill: 'bg-[#ede8f8] text-[#7060b0]',
   },
   dark: {
     // Page / layout
     bg: 'bg-[#1e1e1e]',
     panelBg: 'bg-[#161618]',
     border: 'border-[#2d2d2d]',
-    divider: 'border-[#2d2d2d]',
 
     // Typography
     heading: 'text-white',
@@ -73,7 +106,6 @@ export const PAGE_THEME = {
 
     // Empty / skeleton states
     skeleton: 'bg-[#2e2e3e]',
-    emptyIcon: 'text-[#3a3a55]',
     emptyTitle: 'text-[#e8e8f0]',
     emptyBody: 'text-[#7070a0]',
 
@@ -81,6 +113,40 @@ export const PAGE_THEME = {
     deleteBtn: 'border-[#2e2e3e] bg-[#1c1c28] text-[#ff7a5a] hover:bg-[#2d1820] hover:border-[#7a2030]',
     navBtn: 'bg-[#242424] border-[#2d2d2d] text-[#888888] hover:bg-[#2e2e2e] hover:text-[#e0e0e0]',
     datePill: 'bg-[#242424] border-[#2d2d2d] text-[#888888]',
+
+    page: 'bg-[#1a1a1a] text-[#d0d0d0]',
+    header: 'bg-[#1a1a1a] border-[#252525]',
+    card: 'bg-[#1e1e26] border-[#2a2a38] hover:border-[#363648] hover:bg-[#21212e]',
+    cardTitle: 'text-[#c8c8d8] line-through decoration-[#4a4a60] decoration-1',
+    cardMeta: 'text-[#5a5a78]',
+    cardAge: 'text-[#4a4a5e] bg-[#1c1c28] border border-[#2a2a38]',
+    badge: {
+      high: 'bg-[#2d1410]/80 text-[#c06050] border border-[#5a2820]/60',
+      medium: 'bg-[#251d08]/80 text-[#9a7030] border border-[#5a4010]/60',
+      low: 'bg-[#0e1830]/80 text-[#4878a0] border border-[#1a3050]/60',
+    },
+    divider: 'bg-[#222230]',
+    emptyIcon: 'text-[#2e2e42]',
+    emptyText: 'text-[#3e3e58]',
+    emptySubtext: 'text-[#2e2e42]',
+    // action buttons
+    btnRedate: 'bg-[#2a2040] text-[#9a82e8] border border-[#3a3058] hover:bg-[#322850] hover:text-[#b8a0ff] hover:border-[#4a4070]',
+    btnComplete: 'bg-[#0e2218] text-[#3a9060] border border-[#1a3828] hover:bg-[#122c1e] hover:text-[#4aaa72] hover:border-[#226040]',
+    btnDelete: 'bg-[#1e1218] text-[#7a3840] border border-[#2e1e28] hover:bg-[#281420] hover:text-[#c04858] hover:border-[#6a2038]',
+    // date picker
+    datePicker: 'bg-[#16161e] border-[#2e2e3e] text-[#d0d0e0]',
+    dateInput: 'bg-[#1e1e28] border-[#2e2e3e] text-[#d0d0e0] focus:border-[#7a62d8]',
+    dateConfirm: 'bg-[#3b2fa0] text-white hover:bg-[#4a3cbb]',
+    dateCancel: 'bg-[#222230] text-[#7070a0] hover:bg-[#2a2a40]',
+    // stats bar
+    statsBar: 'bg-[#1c1c26] border-[#252535]',
+    statsLabel: 'text-[#3e3e58]',
+    statsValue: 'text-[#7070a0]',
+    // filter tabs
+    tabActive: 'bg-[#2a2040] text-[#9a82e8] border border-[#3a3058]',
+    tabInactive: 'text-[#5a5a78] hover:text-[#9898b0] hover:bg-[#1e1e2a]',
+    // header count pill
+    countPill: 'bg-[#251d38] text-[#7a62b8]',
   },
 } as const
 

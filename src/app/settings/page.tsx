@@ -1,6 +1,6 @@
 'use client'
 
-import { useUser, useUpdateUser } from '@/features/auth/api/use-user'
+import { useUser, useUpdateUser, useLogout } from '@/features/auth/api/use-user'
 import { EditableField } from '@/features/settings/components/EditableField'
 import { ThemeToggle } from '@/features/settings/components/ThemeToggle'
 import { ConnectClaudeCard } from '@/features/settings/components/ConnectClaudeCard'
@@ -8,6 +8,7 @@ import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { TIMEZONE_OPTIONS } from '@/Common/Constants/TimeZones'
 import { formatMinutes } from '@/Common'
+import { useRouter } from 'next/navigation'; // <--- Use 'next/navigation' instead
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -18,8 +19,8 @@ export default function SettingsPage() {
 
   const { data: user, isLoading } = useUser()
   const { mutate: updateUser, isPending } = useUpdateUser()
-
-
+  const { mutate: logout, isPending: isPendingLogout } = useLogout()
+  const router = useRouter()
   if (isLoading) {
     return (
       <div className={`min-h-screen ${pt.bg}`}>
@@ -108,8 +109,23 @@ export default function SettingsPage() {
 
           {/* ── Connect Claude ── */}
           <ConnectClaudeCard theme={theme} />
+          {/**Logout */}
+          <button
+            onClick={() =>
+              logout(undefined, {
+                onSuccess: () => {
+                  router.replace('/login')
+                }
+              })
+            }
+            disabled={isPendingLogout}
+            className={`bg-blue-500 text-white px-4 py-2 rounded-md transition ${isPendingLogout ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+              }`}
+          >
+            {isPendingLogout ? 'Logging out...' : 'Logout'}
+          </button>
         </div>
       </div>
-    </div>
+    </div >
   )
 }

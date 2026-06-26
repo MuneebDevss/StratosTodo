@@ -74,3 +74,16 @@ export function useUpdateUser() {
     }
   });
 }
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      await apiClient.post('/auth/logout');
+    },
+    onSuccess: (_) => {
+      queryClient.removeQueries({ queryKey: USER_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY });
+    }
+  });
+}

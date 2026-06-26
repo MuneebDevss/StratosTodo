@@ -197,7 +197,3 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
 )
 
 DaySection.displayName = 'DaySection'
-
-function isTomorrow(dateStr: any) {
-  throw new Error('Function not implemented.')
-}
