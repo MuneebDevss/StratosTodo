@@ -11,7 +11,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
 
   // Public pages that do not get the application layout shell
-  const isPublicRoute = pathname === '/' || pathname === '/login' || pathname === '/register';
+  const isPublicRoute = pathname === '/' || pathname === '/login' || pathname === '/register' || pathname == 'landing';
 
   if (isPublicRoute) {
     return <>{children}</>;
