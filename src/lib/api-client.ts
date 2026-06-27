@@ -54,6 +54,8 @@ apiClient.interceptors.response.use(
 
     // Never attempt to refresh the refresh endpoint itself
     if (original.url?.includes('/auth/refresh')) {
+      // Refresh itself failed → user is definitely logged out
+      window.location.replace('/login');
       return Promise.reject(error);
     }
 
@@ -88,8 +90,12 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       // Reject everything waiting
       processQueue(refreshError);
-      window.location.href = '/login';
+
+      // IMPORTANT:
+      // Do NOT redirect here.
+      // Let React Query / useUser() handle the unauthenticated state.
       return Promise.reject(refreshError);
+
     } finally {
       isRefreshing = false;
     }
