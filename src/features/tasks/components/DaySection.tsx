@@ -8,6 +8,7 @@ import { useCreateTask, useUpdateTask } from '../api/use-tasks'
 import { DaySectionProps, DropZoneProps, EditFields } from '../types'
 import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { useTheme } from '@/features/settings/hooks/use-theme'
+import { AnimatePresence } from 'framer-motion'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -149,11 +150,13 @@ export const DaySection = forwardRef<HTMLDivElement, DaySectionProps>(
             </div>
           ) : (
             <div className="flex flex-col gap-1.5 mb-2" role="list">
-              {group.tasks.map((task) => (
-                <div key={task.id} role="listitem">
-                  <TaskCard task={task} theme={theme} />
-                </div>
-              ))}
+              <AnimatePresence mode="popLayout">
+                {group.tasks.map((task) => (
+                  <div key={task.id} role="listitem">
+                    <TaskCard task={task} theme={theme} />
+                  </div>
+                ))}
+              </AnimatePresence>
 
               {/* Inline create shell — appears at bottom of the list */}
               {isAdding && (

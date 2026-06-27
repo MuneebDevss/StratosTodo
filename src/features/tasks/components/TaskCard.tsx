@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useCompleteTask, useDeleteTask, useUpdateTask } from '../api/use-tasks'
 import { formatDuration, PRIORITY_CONFIG } from '../utils/format'
 import { TaskEditShell } from './TaskEditShell'
@@ -14,6 +15,33 @@ const PRIORITY_CHIP: Record<string, { light: string; dark: string }> = {
   low: { light: 'bg-[#eef6ff] text-[#1a5fa0]', dark: 'bg-[#0e1e38] text-[#5a9eff]' },
 }
 
+const CARD_VARIANTS: Variants = {
+  initial: {
+    opacity: 0,
+    y: 18,
+    scale: 0.98,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 420,
+      damping: 32,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.9,
+    x: 30,
+    height: 0,
+    marginBottom: 0,
+    transition: {
+      duration: 0.28,
+    },
+  },
+};
 
 // ─── Drag handle icon ─────────────────────────────────────────────────────────
 
@@ -127,7 +155,21 @@ export function TaskCard({
 
   return (
     // Wrapper — position:relative so the handle can sit outside without affecting layout
-    <div className="relative group/task">
+    <motion.div
+      layout
+      layoutId={task.id}
+      variants={CARD_VARIANTS}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      whileHover={{
+        y: -3,
+        transition: {
+          duration: .18
+        }
+      }}
+      className="relative group/task"
+    >
       {/* ── Drag handle — floats to the left, outside the card box ── */}
       {!isEditing && !isCompleted && (
         <div
@@ -135,13 +177,23 @@ export function TaskCard({
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           className={`
-            absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full
-            pl-1 pr-1.5 py-2
-            opacity-0 group-hover/task:opacity-100
-            transition-opacity duration-150
-            cursor-grab active:cursor-grabbing
-            ${t.dragHandle}
-          `}
+absolute
+left-0
+top-1/2
+-translate-y-1/2
+-translate-x-full
+pl-1
+pr-2
+py-2
+opacity-0
+group-hover/task:opacity-100
+group-hover/task:-translate-x-[110%]
+transition-all
+duration-200
+cursor-grab
+active:cursor-grabbing
+${t.dragHandle}
+`}
           aria-label="Drag to reschedule"
           title="Drag to reschedule"
         >
@@ -150,10 +202,27 @@ export function TaskCard({
       )}
 
       {/* ── The actual card ── */}
-      <div
+      <motion.div
+        layout
         ref={cardRef}
-        className={`flex flex-col gap-2.5 border rounded-[10px] px-3.5 py-[11px] cursor-default transition-[border-color,background,box-shadow,opacity,transform] duration-150 ${isDragging ? t.cardDragging : isEditing ? t.cardEditing : t.card
-          } ${isCompleted && !isEditing ? 'opacity-60' : ''}`}
+        className={`
+flex flex-col
+gap-3
+rounded-xl
+border
+px-4
+py-3
+shadow-sm
+hover:shadow-lg
+transition-all
+duration-300
+${isDragging
+            ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl`
+            : isEditing
+              ? t.cardEditing
+              : t.card}
+${isCompleted && !isEditing ? 'opacity-70' : ''}
+`}
         onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
         role="article"
         aria-label={`Task: ${task.title}`}
@@ -163,7 +232,13 @@ export function TaskCard({
           <>
             <div className="flex items-start gap-3">
               {/* Checkbox */}
-              <button
+              <motion.button
+                whileTap={{
+                  scale: .85
+                }}
+                whileHover={{
+                  scale: 1.08
+                }}
                 className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background] duration-150 p-0 ${isCompleted
                   ? 'bg-[#22b573] border-[#22b573]'
                   : theme === 'dark'
@@ -174,19 +249,47 @@ export function TaskCard({
                 disabled={isPending || isCompleted}
                 aria-label={isCompleted ? 'Completed' : 'Mark as complete'}
               >
-                {isCompleted && (
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
-                    <path d="M1.5 4.5l2.5 2.5 4-4" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </button>
+                <AnimatePresence>
+                  {isCompleted && (
+                    <motion.svg
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 500,
+                        damping: 18
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
+              </motion.button>
 
               {/* Body */}
               <div className="flex-1 min-w-0">
-                <div className={`text-[13px] font-medium whitespace-nowrap overflow-hidden text-ellipsis mb-1 ${isCompleted ? t.titleCompleted : t.title
-                  }`}>
+                <motion.div
+                  layout
+                  animate={
+                    isCompleted
+                      ? {
+                        opacity: .6,
+                        scale: .98
+                      }
+                      : { opacity: 1, scale: 1 }
+                  }
+                  className={`
+text-[14px]
+font-semibold
+leading-5
+whitespace-nowrap
+overflow-hidden
+text-ellipsis
+mb-1.5
+${isCompleted ? t.titleCompleted : t.title}
+`}
+                >
                   {task.title}
-                </div>
+                </motion.div>
 
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {/* Priority */}
@@ -234,7 +337,24 @@ export function TaskCard({
               </span>
 
               {/* Action buttons */}
-              <div className="flex gap-1 opacity-0 group-hover/task:opacity-100 transition-opacity duration-150 shrink-0">
+              <motion.div
+                initial={{ opacity: 0, x: 8 }}
+                whileHover={{}}
+                animate={{
+                  opacity: 1
+                }}
+                className="
+flex
+gap-1
+opacity-0
+group-hover/task:opacity-100
+group-hover/task:translate-x-0
+translate-x-2
+transition-all
+duration-200
+shrink-0
+"
+              >
                 {onEdit && (
                   <button
                     className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.actionBtn}`}
@@ -257,12 +377,15 @@ export function TaskCard({
                     <path d="M2 3.5h9M4.5 3.5V2.5a1 1 0 011-1h2a1 1 0 011 1v1M5.5 6v3M7.5 6v3M3 3.5l.5 7a1 1 0 001 1h4a1 1 0 001-1l.5-7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
                   </svg>
                 </button>
-              </div>
+              </motion.div>
             </div>
 
             {/* Description — collapsible */}
             {hasDesc && (
-              <div className="pl-[29px]">
+              <motion.div
+                layout
+                className="pl-[29px]"
+              >
                 <p className={`text-[12px] leading-[1.55] ${t.description} ${descExpanded ? '' : 'line-clamp-2'} cursor-text`}
                   title={task.description ?? ''}>
                   {task.description}
@@ -275,7 +398,7 @@ export function TaskCard({
                     {descExpanded ? 'Show less' : 'Show more'}
                   </button>
                 )}
-              </div>
+              </motion.div>
             )}
           </>
         )}
@@ -293,7 +416,7 @@ export function TaskCard({
             theme={theme}
           />
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div >
   )
 }

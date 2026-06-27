@@ -10,6 +10,7 @@ import { formatDayTitle } from '../utils/format'
 import type { DayColumnProps, EditFields } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
+import { AnimatePresence } from 'framer-motion'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -138,7 +139,9 @@ export function DayColumn({ date }: DayColumnProps) {
 
               {pending.map((task) => (
                 <div key={task.id} role="listitem">
-                  <TaskCard task={task} theme={theme} />
+                  <AnimatePresence>
+                    <TaskCard task={task} theme={theme} />
+                  </AnimatePresence>
                 </div>
               ))}
 
@@ -194,11 +197,13 @@ export function DayColumn({ date }: DayColumnProps) {
                 <span className="font-medium">{completed.length} completed</span>
               </summary>
               <div className="space-y-2.5 mt-3 opacity-75" role="list">
-                {completed.map((task) => (
-                  <div key={task.id} role="listitem">
-                    <TaskCard task={task} theme={theme} />
-                  </div>
-                ))}
+                <AnimatePresence mode="popLayout">
+                  {completed.map((task) => (
+                    <div key={task.id} role="listitem">
+                      <TaskCard task={task} theme={theme} />
+                    </div>
+                  ))}
+                </AnimatePresence>
               </div>
             </details>
           )}
