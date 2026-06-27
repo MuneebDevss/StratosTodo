@@ -35,9 +35,6 @@ export default function Main() {
     if (isAuthenticated) {
       router.replace('/dashboard');
     }
-    else {
-      router.replace('/landing');
-    }
   }, [isLoading, isAuthenticated, router]);
 
   //Intuitive Circular Loading Bar

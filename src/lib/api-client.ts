@@ -18,6 +18,9 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 let isRefreshing = false;
 
+const PUBLIC_ROUTES = ['/', '/landing', '/login', '/register'];
+
+
 let queue: Array<{
   resolve: (value: unknown) => void;
   reject: (reason?: unknown) => void;
@@ -54,8 +57,11 @@ apiClient.interceptors.response.use(
 
     // Never attempt to refresh the refresh endpoint itself
     if (original.url?.includes('/auth/refresh')) {
+      const isPublic = PUBLIC_ROUTES.includes(window.location.pathname);
       // Refresh itself failed → user is definitely logged out
-      window.location.replace('/login');
+      if (!isPublic) {
+        window.location.replace('/login');
+      }
       return Promise.reject(error);
     }
 
