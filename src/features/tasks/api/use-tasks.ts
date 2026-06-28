@@ -118,17 +118,41 @@ export function useDeleteTask() {
 // Complete task (shorthand update)
 export function useCompleteTask() {
   const qc = useQueryClient()
+
   return useMutation({
-    mutationFn: ({ id }: { id: string }) =>
-      apiClient
-        .patch<Task>(`/tasks/${id}`, { status: 'completed' })
-        .then((r) => r.data),
-    onSuccess: (task) => {
-      qc.setQueryData(taskKeys.detail(task.id), task)
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate.toString().split('T')[0]) })
-      qc.invalidateQueries({ queryKey: taskKeys.lists() })
-      qc.invalidateQueries({ queryKey: taskKeys.overdue() })
-      qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
+    // 1. mutationFn ONLY handles the network request
+    mutationFn: async ({ id }: { id: string }) => {
+      const response = await apiClient.patch<Task>(`/tasks/${id}`, { status: 'completed' })
+      return response.data
+    },
+
+    // 2. onMutate runs BEFORE the network request fires
+    onMutate: async ({ id }) => {
+      // Cancel outbound refetches so they don't overwrite our optimistic update
+      await qc.cancelQueries({ queryKey: ['tasks'] })
+
+      // Snapshot the previous value
+      const previousTasks = qc.getQueryData<Task[]>(['tasks'])
+
+      // Optimistically update the cache immediately
+      qc.setQueryData(['tasks'], (old: Task[] | undefined) =>
+        old ? old.map((t: Task) => (t.id === id ? { ...t, status: 'completed' } : t)) : []
+      )
+
+      // Return a context object with the snapshotted value
+      return { previousTasks }
+    },
+
+    // 3. If the mutation fails, use the context we returned from onMutate to rollback
+    onError: (_err, _variables, context) => {
+      if (context?.previousTasks) {
+        qc.setQueryData(['tasks'], context.previousTasks)
+      }
+    },
+
+    // 4. Always refetch or invalidate after success or error to sync with server
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['tasks'] })
     },
   })
 }

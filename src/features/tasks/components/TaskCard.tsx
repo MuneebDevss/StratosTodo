@@ -83,6 +83,7 @@ export function TaskCard({
   const startTimeRef = useRef<number | null>(null)
   const accumulatedSecondsRef = useRef<number>(0)
 
+
   const cardRef = useRef<HTMLDivElement>(null!)
 
   const cancelEdit = useCallback(() => {
@@ -112,6 +113,8 @@ export function TaskCard({
   const isPending = isCompleting || isDeleting || isUpdating
   const priority = PRIORITY_CONFIG[task.basePriority]
   const hasDesc = !!task.description?.trim()
+  // 1. Define the optimistic check state above your JSX
+  const visuallyCompleted = isCompleted || isCompleting;
 
   // ── Timer Handlers ──
   useEffect(() => {
@@ -276,16 +279,26 @@ export function TaskCard({
             <div className="flex items-start gap-3">
               {/* Checkbox */}
               <motion.button
-                whileTap={{ scale: .85 }}
-                whileHover={{ scale: 1.08 }}
-                className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background] duration-150 p-0 ${isCompleted ? 'bg-[#22b573] border-[#22b573]' : theme === 'dark' ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb]' : 'border-[#d0d0da] bg-transparent hover:border-[#1a6bff]'}`}
-                onClick={() => !isCompleted && !isPending && complete({ id: task.id })}
-                disabled={isPending || isCompleted}
-                aria-label={isCompleted ? 'Completed' : 'Mark as complete'}
+                whileTap={visuallyCompleted ? {} : { scale: 0.85 }}
+                whileHover={visuallyCompleted ? {} : { scale: 1.08 }}
+                className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background] duration-150 p-0 ${visuallyCompleted
+                  ? 'bg-[#22b573] border-[#22b573]'
+                  : theme === 'dark'
+                    ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb]'
+                    : 'border-[#d0d0da] bg-transparent hover:border-[#1a6bff]'
+                  }`}
+                onClick={() => !visuallyCompleted && !isPending && complete({ id: task.id })}
+                disabled={isPending || visuallyCompleted}
+                aria-label={visuallyCompleted ? 'Completed' : 'Mark as complete'}
               >
                 <AnimatePresence>
-                  {isCompleted && (
-                    <motion.svg initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 500, damping: 18 }} />
+                  {visuallyCompleted && (
+                    <motion.svg
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+                    />
                   )}
                 </AnimatePresence>
               </motion.button>
@@ -347,7 +360,71 @@ export function TaskCard({
                       )}
                     </div>
                   )}
-
+                  {/* Action buttons */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 8 }}
+                    whileHover={{}}
+                    animate={{ opacity: 1 }}
+                    className="flex gap-1 opacity-0 group-hover/task:opacity-100 group-hover/task:translate-x-0 translate-x-2 transition-all duration-200 shrink-0"
+                  >
+                    <button
+                      className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.deleteBtn}`}
+                      onClick={() => !isPending && !isDeleting && deleteTask({ id: task.id, date: task.scheduledDate })}
+                      disabled={isPending || isDeleting}
+                      aria-label={isDeleting ? "Deleting task" : "Delete task"}
+                    >
+                      <AnimatePresence mode="wait">
+                        {isDeleting ? (
+                          <motion.div
+                            key="loader"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="flex items-center justify-center"
+                          >
+                            {/* Lightweight, premium 60fps rotating progress ring */}
+                            <motion.svg
+                              animate={{ rotate: 360 }}
+                              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                              width="13"
+                              height="13"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                            >
+                              <circle
+                                cx="8"
+                                cy="8"
+                                r="6"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeOpacity="0.2"
+                              />
+                              <path
+                                d="M14 8a6 6 0 00-6-6"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                              />
+                            </motion.svg>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="trash"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="flex items-center justify-center"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                              <path d="M2 3.5h9M4.5 3.5V2.5a1 1 0 011-1h2a1 1 0 011-1v1M5.5 6v3M7.5 6v3M3 3.5l.5 7a1 1 0 001 1h4a1 1 0 001-1l.5-7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                            </svg>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </button>
+                  </motion.div>
                   {/* Bump & Plan */}
                   {task.bumpCount > 0 && (
                     <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${t.chipBump}`} title={`Rescheduled ${task.bumpCount} time${task.bumpCount > 1 ? 's' : ''}`}>
@@ -373,12 +450,7 @@ export function TaskCard({
               {/* Score */}
               <span className={`text-[10px] ml-auto shrink-0 relative z-10 ${t.score}`} aria-label={`Score ${task.compositeScore.toFixed(1)}`}>{task.compositeScore.toFixed(1)}</span>
 
-              {/* Action buttons */}
-              <motion.div initial={{ opacity: 0, x: 8 }} whileHover={{}} animate={{ opacity: 1 }} className="flex gap-1 opacity-0 group-hover/task:opacity-100 group-hover/task:translate-x-0 translate-x-2 transition-all duration-200 shrink-0">
-                <button className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.deleteBtn}`} onClick={() => !isPending && deleteTask({ id: task.id, date: task.scheduledDate })} disabled={isPending} aria-label="Delete task">
-                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M2 3.5h9M4.5 3.5V2.5a1 1 0 011-1h2a1 1 0 011-1v1M5.5 6v3M7.5 6v3M3 3.5l.5 7a1 1 0 001 1h4a1 1 0 001-1l.5-7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" /></svg>
-                </button>
-              </motion.div>
+
             </div>
 
             {/* Description */}
