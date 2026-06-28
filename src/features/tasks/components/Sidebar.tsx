@@ -95,7 +95,7 @@ export function Sidebar() {
   const t = PAGE_THEME[theme]
 
   const email = user?.email ?? ''
-  const derivedName = email ? email.split('@')[0] : 'Munib'
+  const derivedName = email ? email.split('@')[0] : ''
   const userName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1)
   const userAvatar = undefined
 
@@ -188,23 +188,14 @@ export function Sidebar() {
           </svg>
         </button>
 
-        {/* Search */}
-        <NavRow href="/search" label="Search" pathname={pathname}
-          icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" strokeWidth="1.3" /><path d="M12 12l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>}
-        />
+
+
 
         {/* Main nav */}
         {NAV_ITEMS.map(({ href, label, badge, icon }) => (
           <NavRow key={href} href={href} label={label} badge={label == 'Today' ? tasks?.tasks.length : badge ?? undefined} pathname={pathname} icon={icon} />
         ))}
 
-        {/* Favorites */}
-        <SectionHeader label="Favorites" />
-        <NavRow href="/projects/stratos-v1" label="StratosToDo V1 Build" badge={39} pathname={pathname} isProject />
-
-        {/* My Projects */}
-        <SectionHeader label="My Projects" />
-        <div className="h-2" />
 
       </div>
 

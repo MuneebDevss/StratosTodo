@@ -61,7 +61,7 @@ export function TaskCard({
 
   const { theme: contextTheme } = useTheme()
   const theme = externalTheme ?? contextTheme
-  // @ts-ignore
+
   const t = TASK_THEMES[theme]
   const pageTheme = PAGE_THEME[theme]
 
@@ -78,6 +78,10 @@ export function TaskCard({
   // ── Timer state ──
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
+
+  // Real timestamps refs to combat browser background throttling
+  const startTimeRef = useRef<number | null>(null)
+  const accumulatedSecondsRef = useRef<number>(0)
 
   const cardRef = useRef<HTMLDivElement>(null!)
 
@@ -111,29 +115,54 @@ export function TaskCard({
 
   // ── Timer Handlers ──
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null
-    if (isTimerRunning && !isCompleted) {
-      intervalId = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1)
-      }, 1000)
+    if (!isTimerRunning || isCompleted) return
+
+    const updateTime = () => {
+      if (startTimeRef.current !== null) {
+        const currentSessionSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000)
+        setElapsedSeconds(accumulatedSecondsRef.current + currentSessionSeconds)
+      }
     }
+
+    // Sync state immediately upon mounting or switching tabs
+    updateTime()
+
+    const intervalId = setInterval(updateTime, 1000)
+
+    // Force an immediate catch-up sync when the window becomes active again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateTime()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
     return () => {
-      if (intervalId) clearInterval(intervalId)
+      clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [isTimerRunning, isCompleted])
 
   const handleStart = (e: React.MouseEvent) => {
     e.stopPropagation()
+    startTimeRef.current = Date.now()
     setIsTimerRunning(true)
   }
 
   const handlePause = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (startTimeRef.current !== null) {
+      accumulatedSecondsRef.current += Math.floor((Date.now() - startTimeRef.current) / 1000)
+    }
+    startTimeRef.current = null
     setIsTimerRunning(false)
   }
 
   const handleReset = (e: React.MouseEvent) => {
     e.stopPropagation()
+    startTimeRef.current = null
+    accumulatedSecondsRef.current = 0
     setIsTimerRunning(false)
     setElapsedSeconds(0)
   }
@@ -211,7 +240,6 @@ export function TaskCard({
                   transition={{ repeat: Infinity, duration: 2.8, ease: "linear" }}
                 >
                   <svg viewBox="-10 0 40 100" preserveAspectRatio="none" className="w-full h-full fill-current">
-                    {/* Symmetrical mirrored cubic bezier perfectly looping at 50% */}
                     <path d="M 15,0 C 0,16 30,34 15,50 C 0,66 30,84 15,100 L -10,100 L -10,0 Z" />
                   </svg>
                 </motion.div>
@@ -224,7 +252,6 @@ export function TaskCard({
                   transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
                 >
                   <svg viewBox="-10 0 40 100" preserveAspectRatio="none" className="w-full h-full fill-current">
-                    {/* Symmetrical standard cubic bezier perfectly looping at 50% */}
                     <path d="M 15,0 C 30,16 0,34 15,50 C 30,66 0,84 15,100 L -10,100 L -10,0 Z" />
                   </svg>
                 </motion.div>
@@ -334,7 +361,9 @@ export function TaskCard({
 
                   {task.plan_id && (
                     <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${t.chipPlan}`}>
-                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" /></svg>
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                        <path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" />
+                      </svg>
                       Plan
                     </span>
                   )}
