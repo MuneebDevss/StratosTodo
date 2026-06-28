@@ -152,7 +152,7 @@ export default function GraveyardPage() {
   return (
     <div className={`min-h-screen font-sans antialiased ${t.page}`}>
       {/* ── Header ── */}
-      <header className={`sticky top-0 z-40 border-b pt-6 pb-0 px-8 ${t.header}`}>
+      <header className={`sticky top-0  border-b pt-6 pb-0 px-8 ${t.header}`}>
         <div className="max-w-3xl mx-auto">
           {/* Title row */}
           <div className="flex items-center justify-between mb-5">

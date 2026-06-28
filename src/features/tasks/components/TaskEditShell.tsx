@@ -40,7 +40,7 @@ export function TaskEditShell({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') onCancel()
-    if (e.key === 'Enter' && e.metaKey) onSave()
+    if (e.key === 'Enter') onSave()
   }
 
   return (

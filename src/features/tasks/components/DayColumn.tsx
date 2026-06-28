@@ -169,7 +169,7 @@ export function DayColumn({ date }: DayColumnProps) {
             {!isAdding && (
               <button
                 onClick={openShell}
-                className={`mt-5 w-full group flex items-center justify-center gap-2.5 py-3.5 px-5 border border-dashed rounded-2xl text-[13px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1a6bff]/40 focus:ring-offset-2 ${tt.actionBtn}`}
+                className={`my-5 w-full group flex items-center justify-center gap-2.5 py-3.5 px-5 border border-dashed rounded-2xl text-[13px] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1a6bff]/40 focus:ring-offset-2 ${tt.actionBtn}`}
                 aria-label={`Add task for ${main}`}
               >
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${tt.chipDuration}`}>

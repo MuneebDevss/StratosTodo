@@ -70,10 +70,7 @@ export interface TaskEditShellProps {
 }
 export interface TaskCardProps {
   task: Task
-  onEdit?: (task: Task) => void
   theme?: 'light' | 'dark'
-  onThemeToggle?: () => void
-  showThemeToggle?: boolean
 }
 
 export interface DayColumnProps {

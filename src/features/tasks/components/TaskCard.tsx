@@ -7,7 +7,7 @@ import { formatDuration, PRIORITY_CONFIG } from '../utils/format'
 import { TaskEditShell } from './TaskEditShell'
 import type { EditFields, Task, TaskCardProps } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
-import { TASK_THEMES } from '@/Common/Constants/ThemeConstants'
+import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 
 const PRIORITY_CHIP: Record<string, { light: string; dark: string }> = {
   high: { light: 'bg-[#fff0ed] text-[#c94020]', dark: 'bg-[#2d1410] text-[#ff7a5a]' },
@@ -83,10 +83,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void)
 
 export function TaskCard({
   task,
-  onEdit,
   theme: externalTheme,
-  onThemeToggle,
-  showThemeToggle = false,
 }: TaskCardProps) {
   const { mutate: complete, isPending: isCompleting } = useCompleteTask()
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask()
@@ -96,6 +93,7 @@ export function TaskCard({
   const { theme: contextTheme } = useTheme()
   const theme = externalTheme ?? contextTheme
   const t = TASK_THEMES[theme]
+  const pageTheme = PAGE_THEME[theme]
 
   // ── Inline edit ──
   const [isEditing, setIsEditing] = useState(false)
@@ -177,23 +175,23 @@ export function TaskCard({
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           className={`
-absolute
-left-0
-top-1/2
--translate-y-1/2
--translate-x-full
-pl-1
-pr-2
-py-2
-opacity-0
-group-hover/task:opacity-100
-group-hover/task:-translate-x-[110%]
-transition-all
-duration-200
-cursor-grab
-active:cursor-grabbing
-${t.dragHandle}
-`}
+            absolute
+            left-0
+            top-1/2
+            -translate-y-1/2
+            -translate-x-full
+            pl-1
+            pr-2
+            py-2
+            opacity-0
+            group-hover/task:opacity-100
+            group-hover/task:-translate-x-[110%]
+            transition-all
+            duration-200
+            cursor-grab
+            active:cursor-grabbing
+            ${t.dragHandle}
+            `}
           aria-label="Drag to reschedule"
           title="Drag to reschedule"
         >
@@ -206,23 +204,16 @@ ${t.dragHandle}
         layout
         ref={cardRef}
         className={`
-flex flex-col
-gap-3
-rounded-xl
-border
-px-4
-py-3
-shadow-sm
-hover:shadow-lg
-transition-all
-duration-300
-${isDragging
+          flex flex-col
+          gap-3
+          py-3
+          transition-all
+          duration-300
+          ${isDragging
             ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl`
-            : isEditing
-              ? t.cardEditing
-              : t.card}
-${isCompleted && !isEditing ? 'opacity-70' : ''}
-`}
+            : pageTheme.bg}
+          ${isCompleted && !isEditing ? 'opacity-70' : ''}
+      `}
         onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
         role="article"
         aria-label={`Task: ${task.title}`}
@@ -278,15 +269,15 @@ ${isCompleted && !isEditing ? 'opacity-70' : ''}
                       : { opacity: 1, scale: 1 }
                   }
                   className={`
-text-[14px]
-font-semibold
-leading-5
-whitespace-nowrap
-overflow-hidden
-text-ellipsis
-mb-1.5
-${isCompleted ? t.titleCompleted : t.title}
-`}
+                    text-[14px]
+                    font-semibold
+                    leading-5
+                    whitespace-nowrap
+                    overflow-hidden
+                    text-ellipsis
+                    mb-1.5
+                    ${isCompleted ? t.titleCompleted : t.title}
+                    `}
                 >
                   {task.title}
                 </motion.div>
@@ -344,29 +335,17 @@ ${isCompleted ? t.titleCompleted : t.title}
                   opacity: 1
                 }}
                 className="
-flex
-gap-1
-opacity-0
-group-hover/task:opacity-100
-group-hover/task:translate-x-0
-translate-x-2
-transition-all
-duration-200
-shrink-0
-"
+                  flex
+                  gap-1
+                  opacity-0
+                  group-hover/task:opacity-100
+                  group-hover/task:translate-x-0
+                  translate-x-2
+                  transition-all
+                  duration-200
+                  shrink-0
+                  "
               >
-                {onEdit && (
-                  <button
-                    className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.actionBtn}`}
-                    onClick={() => onEdit(task)}
-                    disabled={isPending}
-                    aria-label="Edit task"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                      <path d="M9 2l2 2L4 11H2V9L9 2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                )}
                 <button
                   className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.deleteBtn}`}
                   onClick={() => !isPending && deleteTask({ id: task.id, date: task.scheduledDate })}
