@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@/features/auth/api/use-user'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { useDaySchedule } from '../api/use-tasks'
+import { CreateTaskModal } from '@/Common/components/CreateTaskModal'
 
 // ─── Nav data ─────────────────────────────────────────────────────────────────
 
@@ -98,6 +99,7 @@ export function Sidebar() {
   const derivedName = email ? email.split('@')[0] : ''
   const userName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1)
   const userAvatar = undefined
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = useState(false)
 
   // Close drawer on route change
   useEffect(() => {
@@ -119,6 +121,7 @@ export function Sidebar() {
       className={`flex flex-col h-full w-64 ${t.sidebarBg} ${t.sidebarBody} border-r ${t.sidebarBorder} select-none`}
       aria-label="Main navigation"
     >
+
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-3 pt-3 pb-1 shrink-0">
         <button
@@ -174,7 +177,8 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 flex flex-col gap-0.5 no-scrollbar">
 
         {/* Add task */}
-        <button className={`flex items-center justify-between w-full px-2.5 py-2 rounded-md ${t.sidebarHoverBg} transition-colors mt-1 mb-0.5`}>
+        <button onClick={() => setIsCreateTaskModalOpen(true)}
+          className={`flex items-center justify-between w-full px-2.5 py-2 rounded-md ${t.sidebarHoverBg} transition-colors mt-1 mb-0.5`}>
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 rounded-full bg-[#e8453c] flex items-center justify-center shrink-0">
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -211,6 +215,7 @@ export function Sidebar() {
   return (
     <>
       {/* ── DESKTOP: static sidebar, hidden on sm and below ── */}
+      <CreateTaskModal isOpen={isCreateTaskModalOpen} onClose={() => setIsCreateTaskModalOpen(false)} />
       <div className="hidden sm:flex h-screen sticky top-0 shrink-0 overflow-hidden">
         {sidebarContent}
       </div>

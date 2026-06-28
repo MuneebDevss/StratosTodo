@@ -29,7 +29,7 @@ export function useThemeState(): ThemeContextType {
   const { data: user } = useUserQuery()
   const { mutate: updateUser } = useUpdateUser()
 
-  const [theme, setThemeState] = useState<ThemeKey>('light')
+  const [theme, setThemeState] = useState<ThemeKey>('dark')
 
   // Restore persisted theme before paint (SSR state is not reliable for hydration)
   useLayoutEffect(() => {

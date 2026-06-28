@@ -65,7 +65,7 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (updatedData: Partial<User>) => {
-      const { data } = await apiClient.put('/users/me', updatedData);
+      const { data } = await apiClient.patch('/users/me', updatedData);
       return data;
     },
     onSuccess: (data) => {
