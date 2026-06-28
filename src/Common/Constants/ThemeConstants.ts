@@ -191,6 +191,10 @@ export const TASK_THEMES = {
     durationInput: 'bg-[#f5f5f7] border border-[#e8e8ec] text-[#1a1a2e] rounded-[6px] px-2 py-0.5 text-[11px] w-[56px] text-center focus:outline-none focus:border-[#1a6bff]/50',
     themeToggle: 'border-[#e8e8ec] bg-[#f5f5f7] text-[#6b6b80] hover:bg-[#e8e8f0]',
     dragHandle: 'text-[#c0c0cc] hover:text-[#9898a8]',
+    //Progress Bar colors:
+    progressFill: 'bg-[#1a6bff]/12',
+    progressOverlay: 'bg-[#1a6bff]/18',
+    progressGlow: 'shadow-[inset_0_0_24px_rgba(26,107,255,0.08)]',
   },
   dark: {
     card: 'bg-[#1c1c28] border-[#2e2e3e] hover:border-[#3a3a50] hover:bg-[#1f1f2e]',
@@ -213,6 +217,10 @@ export const TASK_THEMES = {
     durationInput: 'bg-[#141420] border border-[#2e2e3e] text-[#b0b0c8] rounded-[6px] px-2 py-0.5 text-[11px] w-[56px] text-center focus:outline-none focus:border-[#3b5bdb]/50',
     themeToggle: 'border-[#2e2e3e] bg-[#24243a] text-[#7070a0] hover:bg-[#2e2e48]',
     dragHandle: 'text-[#3e3e58] hover:text-[#5a5a80]',
+    //Progress Bar colors:
+    progressFill: 'bg-[#4d8dff]/14',
+    progressOverlay: 'bg-[#4d8dff]/20',
+    progressGlow: 'shadow-[inset_0_0_28px_rgba(77,141,255,0.10)]',
   },
 } as const
 
