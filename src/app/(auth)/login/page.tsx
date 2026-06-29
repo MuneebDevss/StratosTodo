@@ -19,8 +19,8 @@ import { useLogin } from '../../../features/auth/api/user-login';
 
 export default function LoginPage() {
   const loginMutation = useLogin();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(process.env.NODE_ENV === 'development' ? 'munib.urehmann@gmail.com' : '');
+  const [password, setPassword] = useState(process.env.NODE_ENV === 'development' ? 'MuneebCode@69' : '');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -185,7 +185,7 @@ export default function LoginPage() {
 
           {/* Alternate Footer Route Link */}
           <p className="text-center text-[11px] text-zinc-500 pt-1.5 border-t border-zinc-900/60">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
               Create one
             </Link>
