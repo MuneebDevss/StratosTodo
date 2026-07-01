@@ -8,6 +8,7 @@ import { useUser } from '@/features/auth/api/use-user'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { useDaySchedule } from '../api/use-tasks'
 import { CreateTaskModal } from '@/Common/components/CreateTaskModal'
+import { getLocalISOStartOfDate } from '@/Common'
 
 // ─── Nav data ─────────────────────────────────────────────────────────────────
 
@@ -92,7 +93,7 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { data: user } = useUser()
   const { theme } = useTheme()
-  const { data: tasks, isPending } = useDaySchedule(new Date().toString());
+  const { data: tasks, isPending } = useDaySchedule(getLocalISOStartOfDate(new Date(), true));
   const t = PAGE_THEME[theme]
 
   const email = user?.email ?? ''

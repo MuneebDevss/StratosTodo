@@ -18,3 +18,14 @@ export function getLocalISODate(date = new Date()): string {
   const localDate = new Date(date.getTime() - offset * 60 * 1000);
   return localDate.toISOString().split('T')[0];
 }
+
+
+export function getLocalISOStartOfDate(date = new Date(),start = false): string {
+  if (start) {
+    date.setUTCHours(0, 0, 0, 0);
+  }
+  else {
+  date.setUTCHours(0, 0, 0, 0);
+  }
+  return date.toISOString();
+}

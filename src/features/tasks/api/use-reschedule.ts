@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import { taskKeys } from './use-tasks'
+import { getLocalISODate, getLocalISOStartOfDate } from '@/Common/utils/formatter'
 
 interface RescheduleResult {
   rescheduled_count: number
@@ -15,7 +16,7 @@ export function useRunReschedule() {
     mutationFn: () =>
       apiClient.post<RescheduleResult>('/reschedule/run',
          {
-          date: new Date().toISOString().split('T')[0], // 'YYYY-MM-DD'
+          date: getLocalISOStartOfDate(new Date(getLocalISODate()), true),
         }
       ).then((r) => r.data),
     onSuccess: () => {

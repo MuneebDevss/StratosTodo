@@ -5,12 +5,12 @@ import { useDaySchedule, useCreateTask } from '../api/use-tasks'
 import { CapacityBar } from './CapacityBar'
 import { TaskCard } from './TaskCard'
 import { TaskEditShell } from './TaskEditShell'
-import { OverdueBanner } from './OverdueBanner'
 import { formatDayTitle } from '../utils/format'
 import type { DayColumnProps, EditFields } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { AnimatePresence } from 'framer-motion'
+import { getLocalISOStartOfDate } from '@/Common'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@ const EMPTY_FIELDS: EditFields = {
 
 
 export function DayColumn({ date }: DayColumnProps) {
-  const { data: schedule, isLoading, isError } = useDaySchedule(date)
+  const { data: schedule, isLoading, isError } = useDaySchedule(getLocalISOStartOfDate(new Date(date), true))
   const { main, sub } = formatDayTitle(date)
 
   const { theme } = useTheme()

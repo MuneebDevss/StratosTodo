@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useTasks } from '../api/use-tasks'
 import { useUser } from '@/features/auth/api/use-user'
 import type { DayGroup, Task } from '../types'
+import { getLocalISOStartOfDate } from '@/Common'
 
 
 function getWindowDates(startDate: string, count: number): string[] {
@@ -20,8 +21,8 @@ export function useUpcoming(windowStart: string, windowSize = 7) {
   const windowEnd = dates[dates.length - 1]
 
   const { data: tasks = [], isLoading: tasksLoading } = useTasks({
-    startDate: windowStart,
-    endDate: windowEnd,
+    startDate: getLocalISOStartOfDate(new Date(windowStart), true),
+    endDate: getLocalISOStartOfDate(new Date(windowEnd), false),
     status: 'pending',
   })
 
