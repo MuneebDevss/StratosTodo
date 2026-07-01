@@ -84,43 +84,42 @@ export default function ClaudeIntegrationSection() {
             </span>
           </div>
         ) : (
-          /* DISCONNECTED CONFIGURATION STATE: Highly clean technical instruction guide */
+          /* DISCONNECTED CONFIGURATION STATE: Simple, non-technical connection guide */
           <div className="pt-4 border-t border-dashed border-zinc-100 dark:border-zinc-800/60 space-y-3">
-            <h4 className="text-xs font-medium text-zinc-800 dark:text-zinc-300">How to add Stratos to your Claude Desktop App:</h4>
+            <h4 className="text-xs font-medium text-zinc-800 dark:text-zinc-300">How to connect Stratos to Claude.ai:</h4>
 
             <div className="space-y-2 text-xs text-zinc-500 dark:text-zinc-400 pl-0.5">
               <div className="flex items-start gap-2.5">
                 <span className="font-mono text-[10px] bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded text-zinc-400 border border-zinc-200/40 dark:border-zinc-800/50 mt-0.5">1</span>
                 <p>
-                  Open your local Claude Developer configuration profile file at:<br />
-                  <span className="font-mono text-[11px] text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/60 px-1 py-0.5 rounded select-all">
-                    ~/Library/Application Support/Claude/claude_desktop_config.json
-                  </span>
+                  Click the <span className="font-medium text-zinc-700 dark:text-zinc-300">&quot;+&quot;</span> button in the chat box, then select <span className="font-medium text-zinc-700 dark:text-zinc-300">Connectors → Add connector</span>.
                 </p>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <span className="font-mono text-[10px] bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded text-zinc-400 border border-zinc-200/40 dark:border-zinc-800/50 mt-0.5">2</span>
-                <div className="space-y-2 w-full">
-                  <p>Append the custom SSE protocol server structure block inside your config objects:</p>
+                <p>
+                  Click <span className="font-medium text-zinc-700 dark:text-zinc-300">Add custom connector</span>, then name it and paste in the Stratos server URL:
+                </p>
+              </div>
 
-                  {/* Code Block Component */}
-                  <div className="relative group/code rounded-lg overflow-hidden border border-zinc-200/60 dark:border-zinc-800 font-mono text-[11px] bg-zinc-50 dark:bg-[#161618] text-zinc-600 dark:text-zinc-400 p-3">
-                    <pre className="overflow-x-auto whitespace-pre-wrap">{configSnippet}</pre>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(configSnippet)}
-                      className="absolute top-2 right-2 opacity-0 group-hover/code:opacity-100 transition-opacity duration-150 text-[10px] bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 shadow-sm"
-                    >
-                      {copied ? 'Copied' : 'Copy JSON'}
-                    </button>
-                  </div>
+              <div className="pl-[26px] w-full">
+                {/* URL Block Component */}
+                <div className="relative group/code rounded-lg overflow-hidden border border-zinc-200/60 dark:border-zinc-800 font-mono text-[11px] bg-zinc-50 dark:bg-[#161618] text-zinc-600 dark:text-zinc-400 p-3">
+                  <pre className="overflow-x-auto whitespace-pre-wrap">{MCP_SERVER_URL}</pre>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(MCP_SERVER_URL)}
+                    className="absolute top-2 right-2 opacity-0 group-hover/code:opacity-100 transition-opacity duration-150 text-[10px] bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 shadow-sm"
+                  >
+                    {copied ? 'Copied' : 'Copy URL'}
+                  </button>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <span className="font-mono text-[10px] bg-zinc-100 dark:bg-zinc-900 px-1.5 py-0.5 rounded text-zinc-400 border border-zinc-200/40 dark:border-zinc-800/50 mt-0.5">3</span>
-                <p>Completely restart your Claude app workspace instance to establish secure channel sync streams.</p>
+                <p>Click <span className="font-medium text-zinc-700 dark:text-zinc-300">Add</span>, sign in to authorize, and toggle Stratos on. It&apos;ll now appear in your Connectors list, ready to use.</p>
               </div>
             </div>
           </div>
