@@ -2,15 +2,14 @@
 
 import { useLogout, useUpdateUser, useUser } from '@/features/auth/api/use-user'
 import ClaudeIntegrationSection from '@/features/settings/components/ConnectClaudeCard'
-import { useMcpStatus } from '@/features/settings/hooks/use-mcp-status'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import React, { useState, useEffect } from 'react'
-
+import { useRouter } from 'next/navigation'
 export default function SettingsPage() {
   const { data: user, isLoading: isUserLoading } = useUser()
-  const { data: mcpStatus, isLoading: isMcpLoading } = useMcpStatus()
   const { mutate: updateUser, isPending: isUpdating } = useUpdateUser()
   const { mutate: logout, isPending: isLoggingOut } = useLogout()
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
 
   // Local state for immediate user feedback before mutation resolves
@@ -170,7 +169,12 @@ export default function SettingsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => logout()}
+                onClick={() => 
+                  logout(undefined, {
+                    onSuccess: () => {
+                      router.push('/login');
+                    }
+                  })}
                 disabled={isLoggingOut}
                 className="text-xs font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-950/30 hover:bg-red-50 dark:hover:bg-red-950/20 bg-white dark:bg-[#121214] px-3 py-2 rounded-lg shadow-[0_1px_2px_rgba(0,0,0,0.01)] transition-all duration-150 disabled:opacity-40 active:scale-[0.99] w-full sm:w-auto text-center"
               >
