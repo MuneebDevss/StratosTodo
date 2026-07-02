@@ -20,8 +20,8 @@ export function OverdueBanner({ theme: themeProp }: OverdueBannerProps) {
   if (overdueTasks.length === 0 && !result) return null
 
   const message = result
-    ? `${result.rescheduled_count} task${result.rescheduled_count !== 1 ? 's' : ''} rescheduled${
-        result.graveyarded_count > 0 ? ` · ${result.graveyarded_count} need review` : ''
+    ? `${result.seatedCount} task${result.seatedCount !== 1 ? 's' : ''} rescheduled${
+        result.graveyardCount > 0 ? ` · ${result.graveyardCount} need review` : ''
       }`
     : `${overdueTasks.length} overdue task${overdueTasks.length !== 1 ? 's' : ''} from previous days`
 

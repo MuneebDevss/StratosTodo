@@ -4,8 +4,8 @@ import { taskKeys } from './use-tasks'
 import { getLocalISODate, getLocalISOStartOfDate } from '@/Common/utils/formatter'
 
 interface RescheduleResult {
-  rescheduled_count: number
-  graveyarded_count: number
+  seatedCount: number
+  graveyardCount: number
   message: string
 }
 
