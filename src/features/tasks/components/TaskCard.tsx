@@ -201,10 +201,7 @@ export function TaskCard({
       {/* ── Drag handle ── */}
       {!isEditing && !isCompleted && (
         <div
-          draggable
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pl-1 pr-2 py-2 opacity-0 group-hover/task:opacity-100 group-hover/task:-translate-x-[110%] transition-all duration-200 cursor-grab active:cursor-grabbing ${t.dragHandle}`}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pl-1 pr-2 py-2 opacity-0 group-hover/task:opacity-100 group-hover/task:-translate-x-[110%] transition-all duration-200 ${t.dragHandle}`}
           aria-label="Drag to reschedule"
           title="Drag to reschedule"
         >
@@ -216,7 +213,10 @@ export function TaskCard({
       <motion.div
         layout
         ref={cardRef}
-        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-300 ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl` : pageTheme.bg} ${isCompleted && !isEditing ? 'opacity-70' : ''}`}
+        draggable={!isEditing && !isCompleted}
+        onDragStartCapture={handleDragStart}
+        onDragEndCapture={handleDragEnd}
+        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-300 cursor-grab active:cursor-grabbing select-none touch-none ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl` : pageTheme.bg} ${isCompleted && !isEditing ? 'opacity-70' : ''}`}
         onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
         role="article"
         aria-label={`Task: ${task.title}`}
