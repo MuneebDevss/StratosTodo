@@ -61,11 +61,7 @@ export function CreateTaskModal({ isOpen, onClose, theme: externalTheme }: Creat
     const { mutate: createTask, isPending } = useCreateTask()
     const { theme: contextTheme } = useTheme()
     const theme = externalTheme ?? contextTheme ?? 'light'
-
-    // Resolve core application design system theme styling configurations
-    // @ts-ignore
-    const t = TASK_THEMES[theme] || {}
-    const pageTheme = PAGE_THEME[theme] || { bg: theme === 'dark' ? 'bg-[#181824]' : 'bg-white' }
+    
 
     // Component State
     const [fields, setFields] = useState<FormFields>(INITIAL_STATE)

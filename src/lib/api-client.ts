@@ -18,7 +18,7 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 let isRefreshing = false;
 
-const PUBLIC_ROUTES = ['/', '/landing', '/login', '/register'];
+const PUBLIC_ROUTES = ['/', '/landing', '/login', '/register','/docs', '/support', '/review', '/privacy'];
 
 
 let queue: Array<{

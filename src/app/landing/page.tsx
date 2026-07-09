@@ -47,7 +47,7 @@ export default function Home() {
     useEffect(() => {
         const timer = setInterval(() => {
             setSimStep((prev) => (prev + 1) % 3);
-        }, 5000);
+        }, 3000);
         return () => clearInterval(timer);
     }, []);
 
@@ -67,7 +67,11 @@ export default function Home() {
                             <a href="#how-it-works" className="hover:text-zinc-100 transition-colors">How it Works</a>
                             <a href="#reviews" className="hover:text-zinc-100 transition-colors">Reviews</a>
                             <a href="#faq" className="hover:text-zinc-100 transition-colors">FAQ</a>
+                            <Link href="/docs" className="hover:text-zinc-100 transition-colors">Docs</Link>
+                            <Link href="/support" className="hover:text-zinc-100 transition-colors">Support</Link>
                         </nav>
+                        
+                        
                     </div>
 
                     <div className="hidden md:flex items-center gap-4">
@@ -92,6 +96,8 @@ export default function Home() {
                         <a href="#reviews" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">Reviews</a>
                         <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">FAQ</a>
                         <div className="h-px bg-zinc-800 my-2" />
+                        <Link href="/docs" className="block text-zinc-300">Docs</Link>
+                        <Link href="/support" className="block text-zinc-300">Support</Link>
                         <Link href="/login" className="block text-zinc-300">Sign In</Link>
                         <Link href="/register" className="block w-full py-2.5 text-center rounded-lg bg-indigo-600 text-white font-medium">Start Free</Link>
                     </motion.div>
@@ -184,7 +190,7 @@ export default function Home() {
                         {/* Right Box: The Changing Task List */}
                         <div className="lg:col-span-8 space-y-3">
                             <div className="flex items-center justify-between text-xs text-zinc-500">
-                                <span>Today's Intelligent Agenda</span>
+                                <span>Today&apos;s Intelligent Agenda</span>
                                 <span className="font-mono text-[10px]">Step {simStep + 1} of 3</span>
                             </div>
 
@@ -249,7 +255,7 @@ export default function Home() {
                                         <History size={14} className="text-indigo-400" />
                                         <div>
                                             <p className="text-xs text-zinc-400">Call back home insurance provider</p>
-                                            <p className="text-[10px] text-zinc-500">Bumped twice before • Urgency naturally increased so you don't forget it</p>
+                                            <p className="text-[10px] text-zinc-500">Bumped twice before • Urgency naturally increased so you don&apos;t forget it</p>
                                         </div>
                                     </div>
                                     <span className="text-[10px] bg-indigo-950/60 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900/40">Priority Boosted</span>
@@ -288,7 +294,7 @@ export default function Home() {
                         <div className="absolute inset-0 flex items-center justify-center p-4">
                             <div className="bg-zinc-900 text-zinc-200 border border-zinc-800 rounded-xl p-4 text-xs max-w-sm text-center shadow-xl space-y-1">
                                 <span className="font-semibold text-white block">Stratos approaches this differently:</span>
-                                <span>Missed tasks quietly distribute into tomorrow's open capacity slots automatically. No guilt. No mess.</span>
+                                <span>Missed tasks quietly distribute into tomorrow&apos;s open capacity slots automatically. No guilt. No mess.</span>
                             </div>
                         </div>
                     </div>
@@ -341,7 +347,7 @@ export default function Home() {
                         <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
                             <Compass size={18} />
                         </div>
-                        <h3 className="text-lg font-semibold text-white">The "Needs Review" Safety Net</h3>
+                        <h3 className="text-lg font-semibold text-white">The &quot;Needs Review&quot; Safety Net</h3>
                         <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed">
                             If a task gets delayed three times, it stops moving. Instead of endlessly dragging forward and creating a daily wall of clutter, Stratos quietly places it into a specific review tray so you can reset, change details, or drop it altogether.
                         </p>
@@ -382,7 +388,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {testimonials.map((t, idx) => (
                         <div key={idx} className="p-6 rounded-xl bg-zinc-950 border border-zinc-900 flex flex-col justify-between space-y-6">
-                            <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed italic">"{t.quote}"</p>
+                            <p className="text-zinc-300 text-xs sm:text-sm leading-relaxed italic">&quot;{t.quote}&quot;</p>
                             <div className="flex items-center justify-between pt-4 border-t border-zinc-900">
                                 <div>
                                     <h5 className="text-xs font-bold text-white">{t.author}</h5>
