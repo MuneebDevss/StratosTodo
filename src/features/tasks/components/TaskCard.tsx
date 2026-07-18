@@ -5,6 +5,7 @@ import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useCompleteTask, useDeleteTask, useUpdateTask } from '../api/use-tasks'
 import { formatDuration, PRIORITY_CONFIG } from '../utils/format'
 import { TaskEditShell } from './TaskEditShell'
+import { TaskDetailSheet } from './TaskDetailSheet'
 import type { EditFields, Task, TaskCardProps } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
@@ -36,6 +37,7 @@ function GripIcon({ className }: { className?: string }) {
   )
 }
 
+
 // ─── useClickOutside ──────────────────────────────────────────────────────────
 
 function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
@@ -48,6 +50,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void)
     return () => document.removeEventListener('mousedown', listener)
   }, [ref, handler])
 }
+
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -66,13 +69,13 @@ export function TaskCard({
   const pageTheme = PAGE_THEME[theme]
 
   const [isEditing, setIsEditing] = useState(false)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [editFields, setEditFields] = useState<EditFields>({
     title: task.title,
     description: task.description ?? '',
     priority: task.basePriority,
     minutes: String(task.estimatedMinutes),
   })
-  const [descExpanded, setDescExpanded] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
 
   // ── Timer state ──
@@ -96,7 +99,9 @@ export function TaskCard({
     })
   }, [task])
 
-  useClickOutside(cardRef, () => { if (isEditing) cancelEdit() })
+  useClickOutside(cardRef, () => {
+    if (isEditing) cancelEdit()
+  })
 
   const saveEdit = () => {
     const minutes = parseInt(editFields.minutes, 10)
@@ -177,6 +182,19 @@ export function TaskCard({
   const waveColorBack = theme === 'dark' ? 'rgba(77,141,255,0.14)' : 'rgba(26,107,255,0.12)';
   const waveColorFront = theme === 'dark' ? 'rgba(77,141,255,0.20)' : 'rgba(26,107,255,0.18)';
 
+  // ── Card click: open detail sheet (ignore interactive elements) ──
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (
+      target.closest('button') ||
+      target.closest('input') ||
+      target.closest('textarea') ||
+      target.closest('select')
+    ) return
+    if (isEditing || isDragging) return
+    setIsSheetOpen(true)
+  }
+
   // ── Drag handlers ──
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move'
@@ -188,6 +206,7 @@ export function TaskCard({
   const handleDragEnd = () => setIsDragging(false)
 
   return (
+    <>
     <motion.div
       layout
       layoutId={task.id}
@@ -195,7 +214,7 @@ export function TaskCard({
       initial="initial"
       animate="animate"
       exit="exit"
-      whileHover={{ y: -3, transition: { duration: .18 } }}
+      whileHover={{ y: -2, transition: { duration: .15 } }}
       className="relative group/task"
     >
       {/* ── Drag handle ── */}
@@ -216,8 +235,14 @@ export function TaskCard({
         draggable={!isEditing && !isCompleted}
         onDragStartCapture={handleDragStart}
         onDragEndCapture={handleDragEnd}
-        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-300 cursor-grab active:cursor-grabbing select-none touch-none ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl` : pageTheme.bg} ${isCompleted && !isEditing ? 'opacity-70' : ''}`}
+        onClick={handleCardClick}
         onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
+        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-200 select-none touch-none
+          ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl cursor-grabbing` : `${pageTheme.bg} cursor-pointer`}
+          ${isEditing ? 'cursor-default' : ''}
+          ${isCompleted && !isEditing ? 'opacity-70' : ''}
+          ${isSheetOpen && !isEditing ? (theme === 'dark' ? 'ring-1 ring-[#3b5bdb]/25' : 'ring-1 ring-[#1a6bff]/20') : ''}
+        `}
         role="article"
         aria-label={`Task: ${task.title}`}
       >
@@ -279,33 +304,46 @@ export function TaskCard({
             <div className="flex items-start gap-3">
               {/* Checkbox */}
               <motion.button
-                whileTap={visuallyCompleted ? {} : { scale: 0.85 }}
-                whileHover={visuallyCompleted ? {} : { scale: 1.08 }}
-                className={`mt-[1px] w-[17px] h-[17px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background] duration-150 p-0 ${visuallyCompleted
-                  ? 'bg-[#22b573] border-[#22b573]'
-                  : theme === 'dark'
-                    ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb]'
-                    : 'border-[#d0d0da] bg-transparent hover:border-[#1a6bff]'
+                whileTap={visuallyCompleted ? {} : { scale: 0.82 }}
+                whileHover={visuallyCompleted ? {} : { scale: 1.1 }}
+                className={`mt-[2px] w-[18px] h-[18px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background,box-shadow] duration-150 p-0
+                  ${visuallyCompleted
+                    ? 'bg-[#22b573] border-[#22b573] shadow-[0_0_8px_rgba(34,181,115,0.4)]'
+                    : theme === 'dark'
+                      ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb] hover:shadow-[0_0_6px_rgba(59,91,219,0.3)]'
+                      : 'border-[#c8c8d8] bg-transparent hover:border-[#1a6bff] hover:shadow-[0_0_6px_rgba(26,107,255,0.25)]'
                   }`}
-                onClick={() => !visuallyCompleted && !isPending && complete({ id: task.id })}
+                onClick={(e) => { e.stopPropagation(); !visuallyCompleted && !isPending && complete({ id: task.id }) }}
                 disabled={isPending || visuallyCompleted}
                 aria-label={visuallyCompleted ? 'Completed' : 'Mark as complete'}
               >
                 <AnimatePresence>
                   {visuallyCompleted && (
                     <motion.svg
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
                       transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                    />
+                      width="11"
+                      height="11"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                    >
+                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </motion.svg>
                   )}
                 </AnimatePresence>
               </motion.button>
 
               {/* Body */}
               <div className="flex-1 min-w-0">
-                <motion.div layout animate={isCompleted ? { opacity: .6, scale: .98 } : { opacity: 1, scale: 1 }} className={`text-[14px] font-semibold leading-5 whitespace-nowrap overflow-hidden text-ellipsis mb-1.5 ${isCompleted ? t.titleCompleted : t.title}`}>
+                <motion.div
+                  layout
+                  animate={isCompleted ? { opacity: .55, scale: .98 } : { opacity: 1, scale: 1 }}
+                  className={`text-[14px] font-semibold leading-snug whitespace-nowrap overflow-hidden text-ellipsis mb-1.5
+                    ${isCompleted ? t.titleCompleted : t.title}
+                  `}
+                >
                   {task.title}
                 </motion.div>
 
@@ -325,143 +363,69 @@ export function TaskCard({
                     {formatDuration(task.estimatedMinutes)}
                   </span>
 
-                  {/* Timer Controls */}
-                  {!isCompleted && (
-                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                      {!isTimerRunning ? (
-                        <button
-                          onClick={handleStart}
-                          className={`inline-flex items-center justify-center p-1 rounded-[5px] transition-colors duration-150 ${theme === 'dark' ? 'hover:bg-[#2c2c3f] text-[#5a9eff]' : 'hover:bg-[#f0f4f8] text-[#1a5fa0]'}`}
-                          aria-label="Start timer"
-                          title="Start timer"
-                        >
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={handlePause}
-                          className={`inline-flex items-center justify-center p-1 rounded-[5px] transition-colors duration-150 ${theme === 'dark' ? `${t.progressOverlay} text-[#4d8dff]` : `${t.progressOverlay} text-[#1a6bff]`}`}
-                          aria-label="Pause timer"
-                          title="Pause timer"
-                        >
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                        </button>
-                      )}
-
-                      {elapsedSeconds > 0 && (
-                        <button
-                          onClick={handleReset}
-                          className={`inline-flex items-center justify-center p-1 rounded-[5px] transition-colors duration-150 ${theme === 'dark' ? 'hover:bg-[#3d1a1a] text-[#ff7a5a]' : 'hover:bg-[#fff0ed] text-[#c94020]'}`}
-                          aria-label="Reset timer"
-                          title="Reset timer"
-                        >
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
-                        </button>
-                      )}
-                    </div>
+                  {/* Timer running indicator */}
+                  {isTimerRunning && (
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${theme === 'dark' ? 'bg-[#1a3060] text-[#4d8dff]' : 'bg-[#eef6ff] text-[#1a6bff]'}`}>
+                      <motion.span animate={{ opacity: [1, 0.3, 1] }} transition={{ repeat: Infinity, duration: 1.2 }}>⏱</motion.span>
+                      {Math.floor(elapsedSeconds / 60).toString().padStart(2, '0')}:{(elapsedSeconds % 60).toString().padStart(2, '0')}
+                    </span>
                   )}
-                  {/* Action buttons */}
+                  {/* Delete btn */}
                   <motion.div
                     initial={{ opacity: 0, x: 8 }}
-                    whileHover={{}}
                     animate={{ opacity: 1 }}
                     className="flex gap-1 opacity-0 group-hover/task:opacity-100 group-hover/task:translate-x-0 translate-x-2 transition-all duration-200 shrink-0"
                   >
                     <button
                       className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.deleteBtn}`}
-                      onClick={() => !isPending && !isDeleting && deleteTask({ id: task.id, date: task.scheduledDate })}
+                      onClick={(e) => { e.stopPropagation(); !isPending && !isDeleting && deleteTask({ id: task.id, date: task.scheduledDate }) }}
                       disabled={isPending || isDeleting}
-                      aria-label={isDeleting ? "Deleting task" : "Delete task"}
+                      aria-label={isDeleting ? 'Deleting task' : 'Delete task'}
                     >
                       <AnimatePresence mode="wait">
                         {isDeleting ? (
-                          <motion.div
-                            key="loader"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            className="flex items-center justify-center"
-                          >
-                            {/* Lightweight, premium 60fps rotating progress ring */}
-                            <motion.svg
-                              animate={{ rotate: 360 }}
-                              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                              width="13"
-                              height="13"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                            >
-                              <circle
-                                cx="8"
-                                cy="8"
-                                r="6"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeOpacity="0.2"
-                              />
-                              <path
-                                d="M14 8a6 6 0 00-6-6"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                              />
-                            </motion.svg>
-                          </motion.div>
+                          <motion.svg key="spin" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} width="13" height="13" viewBox="0 0 16 16" fill="none">
+                            <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.2" />
+                            <path d="M14 8a6 6 0 00-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          </motion.svg>
                         ) : (
-                          <motion.div
-                            key="trash"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                            className="flex items-center justify-center"
-                          >
-                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                              <path d="M2 3.5h9M4.5 3.5V2.5a1 1 0 011-1h2a1 1 0 011-1v1M5.5 6v3M7.5 6v3M3 3.5l.5 7a1 1 0 001 1h4a1 1 0 001-1l.5-7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                            </svg>
-                          </motion.div>
+                          <motion.svg key="trash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} width="13" height="13" viewBox="0 0 13 13" fill="none">
+                            <path d="M2 3.5h9M4.5 3.5V2.5a1 1 0 011-1h2a1 1 0 011-1v1M5.5 6v3M7.5 6v3M3 3.5l.5 7a1 1 0 001 1h4a1 1 0 001-1l.5-7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                          </motion.svg>
                         )}
                       </AnimatePresence>
                     </button>
                   </motion.div>
-                  {/* Bump & Plan */}
+
+                  {/* Bump & Plan badges */}
                   {task.bumpCount > 0 && (
                     <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${t.chipBump}`} title={`Rescheduled ${task.bumpCount} time${task.bumpCount > 1 ? 's' : ''}`}>
-                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                        <path d="M9 5.5A3.5 3.5 0 112 5.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-                        <path d="M9 3v2.5H6.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M9 5.5A3.5 3.5 0 112 5.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" /><path d="M9 3v2.5H6.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" /></svg>
                       Bumped {task.bumpCount}×
                     </span>
                   )}
-
                   {task.plan_id && (
                     <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${t.chipPlan}`}>
-                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                        <path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" />
-                      </svg>
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1l1.2 3.6H10L7 6.8l1.1 3.7L5.5 8.4 2.9 10.5 4 6.8 1 4.6h3.3L5.5 1z" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" /></svg>
                       Plan
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Score */}
-              <span className={`text-[10px] ml-auto shrink-0 relative z-10 ${t.score}`} aria-label={`Score ${task.compositeScore.toFixed(1)}`}>{task.compositeScore.toFixed(1)}</span>
-
-
+              {/* Score + open-sheet hint */}
+              <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
+                <span className={`text-[10px] relative z-10 ${t.score}`}>{task.compositeScore.toFixed(1)}</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={`opacity-0 group-hover/task:opacity-60 transition-opacity ${theme === 'dark' ? 'text-[#5a5a80]' : 'text-[#9898a8]'}`}>
+                  <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             </div>
 
-            {/* Description */}
+            {/* Description preview (2-line clamp) */}
             {hasDesc && (
-              <motion.div layout className="pl-[29px]">
-                <p className={`text-[12px] leading-[1.55] ${t.description} ${descExpanded ? '' : 'line-clamp-2'} cursor-text`} title={task.description ?? ''}>{task.description}</p>
-                {task.description!.length > 120 && (
-                  <button className={`mt-0.5 text-[11px] font-medium ${theme === 'dark' ? 'text-[#3b5bdb] hover:text-[#5a7aff]' : 'text-[#1a6bff] hover:text-[#0f5ce8]'} transition-colors duration-100`} onClick={() => setDescExpanded(v => !v)}>
-                    {descExpanded ? 'Show less' : 'Show more'}
-                  </button>
-                )}
+              <motion.div layout className="pl-[30px]">
+                <p className={`text-[12px] leading-relaxed line-clamp-2 ${t.description}`}>{task.description}</p>
               </motion.div>
             )}
           </div>
@@ -475,5 +439,20 @@ export function TaskCard({
         )}
       </motion.div>
     </motion.div>
+
+    {/* ── Task Detail Sheet ── */}
+    <TaskDetailSheet
+      task={task}
+      theme={theme}
+      isOpen={isSheetOpen}
+      onClose={() => setIsSheetOpen(false)}
+      elapsedSeconds={elapsedSeconds}
+      isTimerRunning={isTimerRunning}
+      progressPercent={progressPercent}
+      onStart={() => { startTimeRef.current = Date.now(); setIsTimerRunning(true) }}
+      onPause={() => { if (startTimeRef.current !== null) { accumulatedSecondsRef.current += Math.floor((Date.now() - startTimeRef.current) / 1000) } startTimeRef.current = null; setIsTimerRunning(false) }}
+      onReset={() => { startTimeRef.current = null; accumulatedSecondsRef.current = 0; setIsTimerRunning(false); setElapsedSeconds(0) }}
+    />
+    </>
   )
 }
