@@ -95,6 +95,54 @@ export function DayColumn({ date }: DayColumnProps) {
         <CapacityBar usedMinutes={usedMinutes} totalMinutes={totalMinutes} theme={theme} />
       </div>
 
+      {/* Daily Progress */}
+      {!isLoading && !isError && tasks.length > 0 && (
+        <div className={`${t.bg} ${t.border} border rounded-lg p-4 sm:p-5 shadow-sm mb-6 transition-all space-y-3.5`}>
+          <div className="flex justify-between items-start">
+            <div>
+              <p className={`text-xs uppercase tracking-wider ${t.subheading}`}>
+                Today's Progress
+              </p>
+              <h3 className={`mt-1 text-lg font-semibold ${t.heading}`}>
+                {completed.length} of {tasks.length} tasks done
+              </h3>
+            </div>
+            <div className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${
+              theme === 'light' 
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                : 'bg-emerald-950/50 text-emerald-300 border-emerald-800'
+            }`}>
+              {tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0}%
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className={`h-2 overflow-hidden rounded-full ${theme === 'light' ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+              <div
+                className={`h-full rounded-full transition-all duration-700 ease-out ${
+                  theme === 'light' ? 'bg-emerald-500' : 'bg-emerald-600'
+                }`}
+                style={{ width: `${tasks.length > 0 ? (completed.length / tasks.length) * 100 : 0}%` }}
+                role="progressbar"
+                aria-valuenow={tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className={t.body}>
+                {completed.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)} of {tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)} minutes completed
+              </span>
+              <span className={t.subheading}>
+                {tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0) > 0 
+                  ? Math.round((completed.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0) / tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)) * 100)
+                  : 0}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Loading */}
       {isLoading && (
         <div className="space-y-3">

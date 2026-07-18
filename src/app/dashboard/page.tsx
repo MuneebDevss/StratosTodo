@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DayColumn } from '@/features/tasks'
 import { OverdueBanner } from '@/features/tasks'
 import { useTheme } from '@/features/settings/hooks/use-theme'
@@ -11,6 +11,29 @@ export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(
     () => getLocalISODate(),
   )
+
+  /**
+   * Handles the keyboard input for navigation
+   * Left Arrow : Navigate to the previous day
+   * Right Arrow : Navigate to the next day
+   * T : Navigate to the current day
+   * @param event - The keyboard event.
+   */
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowLeft') {
+      setSelectedDate(d => navigate(d, -1))
+    } else if (event.key === 'ArrowRight') {
+      setSelectedDate(d => navigate(d, 1))
+    } else if (event.key === 't') {
+      setSelectedDate(getLocalISODate())
+    }
+  }
+
+  // Add event listener for keyboard navigation.
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => document.removeEventListener('keydown', handleKeyPress)
+  }, [handleKeyPress])
 
   // Shared user preference — same source as Settings page.
   const { theme } = useTheme()
