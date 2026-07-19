@@ -6,6 +6,7 @@ import { useCompleteTask, useDeleteTask, useUpdateTask } from '../api/use-tasks'
 import { formatDuration, PRIORITY_CONFIG } from '../utils/format'
 import { TaskEditShell } from './TaskEditShell'
 import { TaskDetailSheet } from './TaskDetailSheet'
+import { ConfirmDeleteTaskDialog } from './ConfirmDeleteTaskDialog'
 import type { EditFields, Task, TaskCardProps } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
@@ -77,6 +78,7 @@ export function TaskCard({
     minutes: String(task.estimatedMinutes),
   })
   const [isDragging, setIsDragging] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   // ── Timer state ──
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
@@ -378,7 +380,7 @@ export function TaskCard({
                   >
                     <button
                       className={`w-6 h-6 rounded-[6px] border flex items-center justify-center cursor-pointer transition-[background,color] duration-150 p-0 ${t.deleteBtn}`}
-                      onClick={(e) => { e.stopPropagation(); !isPending && !isDeleting && deleteTask({ id: task.id, date: task.scheduledDate }) }}
+                      onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true) }}
                       disabled={isPending || isDeleting}
                       aria-label={isDeleting ? 'Deleting task' : 'Delete task'}
                     >
@@ -452,6 +454,20 @@ export function TaskCard({
       onStart={() => { startTimeRef.current = Date.now(); setIsTimerRunning(true) }}
       onPause={() => { if (startTimeRef.current !== null) { accumulatedSecondsRef.current += Math.floor((Date.now() - startTimeRef.current) / 1000) } startTimeRef.current = null; setIsTimerRunning(false) }}
       onReset={() => { startTimeRef.current = null; accumulatedSecondsRef.current = 0; setIsTimerRunning(false); setElapsedSeconds(0) }}
+    />
+
+    {/* ── Task Delete Confirmation Dialog ── */}
+    <ConfirmDeleteTaskDialog
+      open={showDeleteConfirm}
+      taskTitle={task.title}
+      isDeleting={isDeleting}
+      onConfirm={() => {
+        deleteTask({ id: task.id, date: task.scheduledDate }, {
+          onSuccess: () => setShowDeleteConfirm(false)
+        })
+      }}
+      onCancel={() => setShowDeleteConfirm(false)}
+      theme={theme}
     />
     </>
   )

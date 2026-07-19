@@ -7,7 +7,8 @@ import { useCompleteTask, useDeleteTask, useUpdateTask } from '../api/use-tasks'
 import { formatDuration, PRIORITY_CONFIG } from '../utils/format'
 import type { Task, EditFields } from '../types'
 import { TASK_THEMES, PAGE_THEME } from '@/Common/Constants/ThemeConstants'
-
+import { ConfirmDeleteTaskDialog } from './ConfirmDeleteTaskDialog'
+import { formatDateLabel } from '@/features/tasks/utils/format'
 // ─── Priority config ──────────────────────────────────────────────────────────
 
 const PRIORITY_COLORS: Record<string, { light: string; dark: string; dot: string }> = {
@@ -51,10 +52,7 @@ function formatElapsed(seconds: number) {
   return `${m}:${s}`
 }
 
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr + 'T00:00:00')
-  return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
-}
+
 
 // ─── Section heading ──────────────────────────────────────────────────────────
 
@@ -94,6 +92,7 @@ export function TaskDetailSheet({
 
   // ── Inline edit state ──
   const [isEditing, setIsEditing] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [editFields, setEditFields] = useState<EditFields>({
     title: task.title,
     description: task.description ?? '',
@@ -362,12 +361,9 @@ export function TaskDetailSheet({
                         <path d="M1 6h12" stroke="currentColor" strokeWidth="1.2" />
                         <path d="M4 1v3M10 1v3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
-                      {formatDate(task.scheduledDate)}
+                      {formatDateLabel(task.scheduledDate.split('T')[0])}
                     </span>
-                    {/* Score */}
-                    <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-[8px] ${theme === 'dark' ? 'bg-[#1e1e30] text-[#5a5a80] border border-[#2a2a40]' : 'bg-[#f4f4f8] text-[#9898a8] border border-[#e4e4ec]'}`}>
-                      Score: {task.compositeScore.toFixed(1)}
-                    </span>
+
                     {/* Bump count */}
                     {task.bumpCount > 0 && (
                       <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-[8px] ${t.chipBump}`}>
@@ -497,7 +493,7 @@ export function TaskDetailSheet({
                   </button>
                 )}
                 <button
-                  onClick={() => !isPending && !isDeleting && deleteTask({ id: task.id, date: task.scheduledDate })}
+                  onClick={() => setShowDeleteConfirm(true)}
                   disabled={isPending || isDeleting}
                   className={`${isCompleted ? 'flex-1' : 'w-10'} h-10 rounded-[10px] flex items-center justify-center gap-2 text-[13px] font-semibold border transition-colors disabled:opacity-50 ${theme === 'dark' ? 'bg-[#2d1410] text-[#ff7a5a] border-[#5a2018] hover:bg-[#3d1a10]' : 'bg-[#fff0ed] text-[#c94020] border-[#f5c0b0] hover:bg-[#ffe0d8]'}`}
                   aria-label="Delete task"
@@ -524,6 +520,23 @@ export function TaskDetailSheet({
               </div>
             )}
           </motion.aside>
+
+          {/* ── Task Delete Confirmation Dialog ── */}
+          <ConfirmDeleteTaskDialog
+            open={showDeleteConfirm}
+            taskTitle={task.title}
+            isDeleting={isDeleting}
+            onConfirm={() => {
+              deleteTask({ id: task.id, date: task.scheduledDate }, {
+                onSuccess: () => {
+                  setShowDeleteConfirm(false)
+                  onClose() // close detail sheet after delete
+                }
+              })
+            }}
+            onCancel={() => setShowDeleteConfirm(false)}
+            theme={theme}
+          />
         </>
       )}
     </AnimatePresence>,
