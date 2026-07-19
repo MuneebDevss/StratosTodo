@@ -237,7 +237,7 @@ export function TaskCard({
         onDragEndCapture={handleDragEnd}
         onClick={handleCardClick}
         onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
-        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-200 select-none touch-none
+        className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-200 select-none touch-pan-y
           ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl cursor-grabbing` : `${pageTheme.bg} cursor-pointer`}
           ${isEditing ? 'cursor-default' : ''}
           ${isCompleted && !isEditing ? 'opacity-70' : ''}
