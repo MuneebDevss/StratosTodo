@@ -16,8 +16,10 @@ export function useLogin() {
       const returnTo = searchParams.get('returnTo');
       if (returnTo) {
         // returnTo was encodeURIComponent(req.url) on the backend — decode once
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL; // e.g. https://reflection-backend-rq55.onrender.com
-        window.location.href = `${backendUrl}${decodeURIComponent(returnTo)}`;
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL; // e.g. https://reflection-backend-rq55.onrender.com/api
+        const oauthBase = backendUrl.replace(/\/api\/?$/, '');
+
+        window.location.href = `${oauthBase}${decodeURIComponent(returnTo)}`;
       } else {
         window.location.href = '/dashboard';
       }
