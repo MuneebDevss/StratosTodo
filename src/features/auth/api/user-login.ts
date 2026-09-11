@@ -13,13 +13,11 @@ export function useLogin() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [USER_QUERY_KEY] });
-      const returnTo = searchParams.get('returnTo');
+      const returnTo = searchParams.get('returnTo'); // already decoded by URLSearchParams
       if (returnTo) {
-        // returnTo was encodeURIComponent(req.url) on the backend — decode once
         const backendUrl = process.env.NEXT_PUBLIC_API_URL; // e.g. https://reflection-backend-rq55.onrender.com/api
-        const oauthBase = backendUrl?.replace(/\/api\/?$/, '')??'';
-
-        window.location.href = `${oauthBase}${decodeURIComponent(returnTo)}`;
+        const oauthBase = backendUrl?.replace(/\/api\/?$/, '') ?? '';
+        window.location.href = `${oauthBase}${returnTo}`;
       } else {
         window.location.href = '/dashboard';
       }
