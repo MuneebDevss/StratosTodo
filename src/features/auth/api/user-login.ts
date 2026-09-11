@@ -1,21 +1,29 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import { apiClient } from '@/lib/api-client';
+import { apiClient, setTokens } from '@/lib/api-client';
 import { USER_QUERY_KEY } from './use-user';
 
 export function useLogin() {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams(); // next/navigation
+  const searchParams = useSearchParams();
 
   return useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
-      await apiClient.post('/auth/login', credentials);
+      const response = await apiClient.post<{ accessToken: string; refreshToken: string }>(
+        '/auth/login',
+        credentials
+      );
+      
+      // Store returned tokens in localStorage
+      setTokens(response.data.accessToken, response.data.refreshToken);
+      return response.data;
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: USER_QUERY_KEY });
-      const returnTo = searchParams.get('returnTo'); // already decoded by URLSearchParams
+      
+      const returnTo = searchParams.get('returnTo');
       if (returnTo) {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL; // e.g. https://reflection-backend-rq55.onrender.com/api
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL;
         const oauthBase = backendUrl?.replace(/\/api\/?$/, '');
 
         if (!oauthBase) {

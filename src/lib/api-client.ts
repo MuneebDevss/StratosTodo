@@ -1,4 +1,3 @@
-// src/lib/api-client.ts
 import axios, {
   AxiosInstance,
   AxiosError,
@@ -9,7 +8,36 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
+});
+
+// Helper utilities for local token management
+export const getAccessToken = () =>
+  typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+export const getRefreshToken = () =>
+  typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+
+export const setTokens = (accessToken: string, refreshToken: string) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  }
+};
+
+export const clearTokens = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }
+};
+
+// Request Interceptor: Attach bearer token automatically
+apiClient.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 interface RetryConfig extends InternalAxiosRequestConfig {
@@ -18,8 +46,7 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 let isRefreshing = false;
 
-const PUBLIC_ROUTES = ['/', '/landing', '/login', '/register','/docs', '/support', '/review', '/privacy'];
-
+const PUBLIC_ROUTES = ['/', '/landing', '/login', '/register', '/docs', '/support', '/review', '/privacy'];
 
 let queue: Array<{
   resolve: (value: unknown) => void;
@@ -32,6 +59,10 @@ function processQueue(error?: unknown) {
     if (error) {
       reject(error);
     } else {
+      const token = getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
       resolve(apiClient(config));
     }
   });
@@ -45,39 +76,27 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const original = error.config as RetryConfig;
 
-    // Ignore requests without a config
-    if (!original) {
+    if (!original || error.response?.status !== 401) {
       return Promise.reject(error);
     }
 
-    // Only handle 401 responses
-    if (error.response?.status !== 401) {
-      return Promise.reject(error);
-    }
-
-    // Never attempt to refresh the refresh endpoint itself
+    // Refresh route failed -> user must log in again
     if (original.url?.includes('/auth/refresh')) {
-      const isPublic = PUBLIC_ROUTES.includes(window.location.pathname);
-      // Refresh itself failed → user is definitely logged out
-      if (!isPublic) {
+      clearTokens();
+      const isPublic = typeof window !== 'undefined' && PUBLIC_ROUTES.includes(window.location.pathname);
+      if (!isPublic && typeof window !== 'undefined') {
         window.location.replace('/login');
       }
       return Promise.reject(error);
     }
 
-    // Prevent infinite retry loops
     if (original._retry) {
       return Promise.reject(error);
     }
 
-    // Queue concurrent requests while refresh is in progress
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
-        queue.push({
-          resolve,
-          reject,
-          config: original,
-        });
+        queue.push({ resolve, reject, config: original });
       });
     }
 
@@ -85,23 +104,34 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // Refresh the access token/cookie
-      await apiClient.post('/auth/refresh');
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
 
-      // Retry queued requests
+      // Call refresh route using dedicated axios instance without interceptors
+      const { data } = await axios.post(
+        `${BASE_URL}/auth/refresh`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        }
+      );
+
+      setTokens(data.accessToken, data.refreshToken);
+
+      if (original.headers) {
+        original.headers.Authorization = `Bearer ${data.accessToken}`;
+      }
+
       processQueue();
-
-      // Retry the original request
       return apiClient(original);
     } catch (refreshError) {
-      // Reject everything waiting
+      clearTokens();
       processQueue(refreshError);
-
-      // IMPORTANT:
-      // Do NOT redirect here.
-      // Let React Query / useUser() handle the unauthenticated state.
       return Promise.reject(refreshError);
-
     } finally {
       isRefreshing = false;
     }
