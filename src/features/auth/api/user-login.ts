@@ -11,15 +11,25 @@ export function useLogin() {
     mutationFn: async (credentials: Record<string, string>) => {
       await apiClient.post('/auth/login', credentials);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [USER_QUERY_KEY] });
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: USER_QUERY_KEY });
       const returnTo = searchParams.get('returnTo'); // already decoded by URLSearchParams
       if (returnTo) {
         const backendUrl = process.env.NEXT_PUBLIC_API_URL; // e.g. https://reflection-backend-rq55.onrender.com/api
-        const oauthBase = backendUrl?.replace(/\/api\/?$/, '') ?? '';
-        window.location.href = `${oauthBase}${returnTo}`;
+        const oauthBase = backendUrl?.replace(/\/api\/?$/, '');
+
+        if (!oauthBase) {
+          throw new Error('NEXT_PUBLIC_API_URL is required for OAuth redirects');
+        }
+
+        const oauthUrl = new URL(returnTo, `${oauthBase}/`);
+        if (oauthUrl.origin !== new URL(oauthBase).origin) {
+          throw new Error('Invalid OAuth return URL');
+        }
+
+        window.location.assign(oauthUrl.toString());
       } else {
-        window.location.href = '/dashboard';
+        window.location.assign('/dashboard');
       }
     },
   });
