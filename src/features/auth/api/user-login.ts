@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient, setTokens } from '@/lib/api-client';
 import { USER_QUERY_KEY } from './use-user';
 
 export function useLogin() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: async (credentials: Record<string, string>) => {
@@ -13,32 +14,21 @@ export function useLogin() {
         '/auth/login',
         credentials
       );
-      
-      // Store returned tokens in localStorage
+
+      // Store returned tokens in localStorage / cookie handler
       setTokens(response.data.accessToken, response.data.refreshToken);
       return response.data;
     },
     onSuccess: async () => {
+      // Refresh current user data in the query cache
       await queryClient.refetchQueries({ queryKey: USER_QUERY_KEY });
-      
+
       const returnTo = searchParams.get('returnTo');
-      if (returnTo) {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL;
-        const oauthBase = backendUrl?.replace(/\/api\/?$/, '');
 
-        if (!oauthBase) {
-          throw new Error('NEXT_PUBLIC_API_URL is required for OAuth redirects');
-        }
-
-        const oauthUrl = new URL(returnTo, `${oauthBase}/`);
-        if (oauthUrl.origin !== new URL(oauthBase).origin) {
-          throw new Error('Invalid OAuth return URL');
-        }
-
-        window.location.assign(oauthUrl.toString());
-      } else {
-        window.location.assign('/dashboard');
-      }
+      // Prevent open redirect vulnerabilities by ensuring returnTo is a relative path
+      const isRelativeUrl = returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//');
+      
+      router.push(isRelativeUrl ? returnTo : '/dashboard');
     },
   });
 }
