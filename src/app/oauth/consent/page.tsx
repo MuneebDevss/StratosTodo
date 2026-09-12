@@ -1,17 +1,17 @@
 // app/oauth/consent/page.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { apiClient } from '@/lib/api-client'
 
-export default function OAuthConsentPage() {
+function ConsentHandler() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken') // match your setTokens key
+    const token = localStorage.getItem('accessToken')
     const qs = searchParams.toString()
 
     if (!token) {
@@ -37,4 +37,12 @@ export default function OAuthConsentPage() {
 
   if (error) return <p>{error}</p>
   return <p>Connecting to Claude…</p>
+}
+
+export default function OAuthConsentPage() {
+  return (
+    <Suspense fallback={<p>Loading…</p>}>
+      <ConsentHandler />
+    </Suspense>
+  )
 }
