@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/seo';
 import { Mail, Clock, ArrowRight, BookOpen } from 'lucide-react';
 import SiteHeader from '@/Common/components/SiteHeader';
 import SiteFooter from '@/Common/components/SiteFooter';
@@ -46,8 +47,11 @@ const issues = [
 ];
 
 export const metadata: Metadata = {
-    title: 'Support | Stratos',
-    description: 'Get help connecting and using the Stratos Claude connector.',
+    ...createPageMetadata({
+        title: 'Stratos Support',
+        description: 'Get help connecting Stratos to Claude and using the Stratos task planner.',
+        path: '/support',
+    }),
 };
 
 export default function SupportPage() {

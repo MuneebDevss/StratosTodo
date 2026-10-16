@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/seo';
 import { ArrowRight, ListChecks, CalendarClock, Gauge, ShieldCheck, KeyRound, Lock, UserCheck } from 'lucide-react';
 import SiteHeader from '@/Common/components/SiteHeader';
 import SiteFooter from '@/Common/components/SiteFooter';
@@ -11,8 +12,11 @@ import SiteFooter from '@/Common/components/SiteFooter';
 const MCP_SERVER_URL = 'https://stratos-todo.vercel.app/mcp';
 
 export const metadata: Metadata = {
-    title: 'Connect Stratos to Claude',
-    description: 'Manage your plans and tasks in Claude using the Stratos connector.',
+    ...createPageMetadata({
+        title: 'Connect Stratos to Claude',
+        description: 'Learn how to connect Stratos to Claude and manage plans, tasks, and schedules from a conversation.',
+        path: '/docs',
+    }),
 };
 
 const featureCards = [

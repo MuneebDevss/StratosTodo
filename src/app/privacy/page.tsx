@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/seo';
 import SiteHeader from '@/Common/components/SiteHeader';
 import SiteFooter from '@/Common/components/SiteFooter';
 
@@ -11,8 +12,11 @@ import SiteFooter from '@/Common/components/SiteFooter';
 // considered final. Nothing has been invented here to fill that gap.
 
 export const metadata: Metadata = {
-    title: 'Privacy Policy | Stratos',
-    description: 'Learn how Stratos collects, stores, and protects your data.',
+    ...createPageMetadata({
+        title: 'Privacy Policy',
+        description: 'Learn how Stratos collects, stores, and protects your data.',
+        path: '/privacy',
+    }),
 };
 
 const LAST_UPDATED = 'May 7, 2026';
