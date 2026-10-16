@@ -49,18 +49,19 @@ export function PlanCard({ plan, theme = 'light' }: PlanCardProps) {
   return (
     <Link
       href={`/plans/${plan.id}`}
-      className={`group flex items-center gap-3.5 border rounded-[10px] px-4 py-3.5 transition-[border-color,background] duration-150 ${t.card}`}
+      className={`group flex h-full items-start gap-3.5 border rounded-2xl p-5 focus-visible:outline-2 focus-visible:outline-indigo-500 transition-[border-color,background] duration-150 ${t.card}`}
       aria-label={`Open plan: ${plan.title}`}
     >
       <div className="flex-1 min-w-0">
-        <div className={`text-[14px] font-semibold mb-1 truncate ${t.title}`}>
+        <div className={`text-lg font-semibold mb-2 break-words ${t.title}`}>
           {plan.title}
         </div>
         {plan.goalDescription && (
-          <p className={`text-[12px] leading-[1.5] mb-2 line-clamp-1 ${t.description}`}>
+          <p className={`text-sm leading-6 mb-5 line-clamp-2 ${t.description}`}>
             {plan.goalDescription}
           </p>
         )}
+        <p className={`mb-4 text-xs ${t.description}`}>Created {new Date(plan.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${badge[theme]}`}>
             {plan.source === 'mcp' && <SparkleIcon />}

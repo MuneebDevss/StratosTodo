@@ -23,7 +23,7 @@ const EMPTY_FIELDS: EditFields = {
 
 
 export function DayColumn({ date }: DayColumnProps) {
-  const { data: schedule, isLoading, isError } = useDaySchedule(getLocalISOStartOfDate(new Date(date), true))
+  const { data: schedule, isLoading, isError, refetch } = useDaySchedule(getLocalISOStartOfDate(new Date(date), true))
   const { main, sub } = formatDayTitle(date)
 
   const { theme } = useTheme()
@@ -91,9 +91,9 @@ export function DayColumn({ date }: DayColumnProps) {
       </div>
 
       {/* Capacity Bar */}
-      <div className={`${t.bg} ${t.border} border rounded-lg p-4 sm:p-5 lg:p-6 shadow-sm mb-6 transition-all`}>
+      {!isLoading && !isError && <div className={`${t.bg} ${t.border} border rounded-xl p-4 sm:p-5 lg:p-6 shadow-sm mb-6 transition-all`}>
         <CapacityBar usedMinutes={usedMinutes} totalMinutes={totalMinutes} theme={theme} />
-      </div>
+      </div>}
 
       {/* Daily Progress */}
       {!isLoading && !isError && tasks.length > 0 && (
@@ -101,7 +101,7 @@ export function DayColumn({ date }: DayColumnProps) {
           <div className="flex justify-between items-start">
             <div>
               <p className={`text-xs uppercase tracking-wider ${t.subheading}`}>
-                Today's Progress
+                Daily progress
               </p>
               <h3 className={`mt-1 text-lg font-semibold ${t.heading}`}>
                 {completed.length} of {tasks.length} tasks done
@@ -125,6 +125,7 @@ export function DayColumn({ date }: DayColumnProps) {
                 style={{ width: `${tasks.length > 0 ? (completed.length / tasks.length) * 100 : 0}%` }}
                 role="progressbar"
                 aria-valuenow={tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0}
+                aria-label="Daily task completion"
                 aria-valuemin={0}
                 aria-valuemax={100}
               />
@@ -157,7 +158,7 @@ export function DayColumn({ date }: DayColumnProps) {
         <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 rounded-2xl p-6 text-center">
           <p className="text-red-600 dark:text-red-400 text-sm">Failed to load tasks for this day.</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => refetch()}
             className="mt-3 inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             Retry
@@ -180,8 +181,8 @@ export function DayColumn({ date }: DayColumnProps) {
             <div className="space-y-2.5" role="list">
               {pending.length === 0 && !isAdding && (
                 <div>
-                  <p className={`font-medium ${t.emptyBody}`}>No pending tasks</p>
-                  <p className={`text-sm mt-1 ${t.body}`}>Add one below to get started</p>
+                  <p className={`font-medium ${t.emptyBody}`}>{tasks.length ? 'You’re all caught up' : 'A little space to plan your day'}</p>
+                  <p className={`text-sm mt-1 ${t.body}`}>{tasks.length ? 'Everything scheduled here is done. Add another task when you’re ready.' : 'Add your first task below. Start with what matters most.'}</p>
                 </div>
               )}
 

@@ -1,97 +1,43 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DayColumn } from '@/features/tasks'
-import { OverdueBanner } from '@/features/tasks'
+import Link from 'next/link'
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { DayColumn, OverdueBanner } from '@/features/tasks'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { getLocalISODate, navigate } from '@/Common'
 import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
 
 export default function DashboardPage() {
-  const [selectedDate, setSelectedDate] = useState(
-    () => getLocalISODate(),
-  )
-
-  /**
-   * Handles the keyboard input for navigation
-   * Left Arrow : Navigate to the previous day
-   * Right Arrow : Navigate to the next day
-   * T : Navigate to the current day
-   * @param event - The keyboard event.
-   */
-  const handleKeyPress = (event: KeyboardEvent) => {
-    if (event.key === 'ArrowLeft') {
-      setSelectedDate(d => navigate(d, -1))
-    } else if (event.key === 'ArrowRight') {
-      setSelectedDate(d => navigate(d, 1))
-    } else if (event.key === 't') {
-      setSelectedDate(getLocalISODate())
-    }
-  }
-
-  // Add event listener for keyboard navigation.
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress)
-    return () => document.removeEventListener('keydown', handleKeyPress)
-  }, [handleKeyPress])
-
-  // Shared user preference — same source as Settings page.
+  const [selectedDate, setSelectedDate] = useState(() => getLocalISODate())
   const { theme } = useTheme()
   const t = PAGE_THEME[theme]
-
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || target.closest('input, textarea, select, button, [contenteditable], [role="dialog"]')) return
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault()
+        setSelectedDate(d => navigate(d, event.key === 'ArrowLeft' ? -1 : 1))
+      } else if (event.key.toLowerCase() === 't') setSelectedDate(getLocalISODate())
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+  const button = `inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border px-3 text-sm focus-visible:outline-2 focus-visible:outline-indigo-500 ${t.navBtn}`
   return (
-    <div className={`flex flex-1 flex-col overflow-hidden h-screen no-scrollbar`}>
-      {/* ── Topbar ── */}
-      <header className={`flex items-center gap-3 pl-14 pr-6 sm:px-6 py-3.5 shrink-0  justify-end`}>
-
-        {/* Date nav */}
-        <div className="flex gap-1">
-          <button
-            className={`w-7 h-7 rounded-[7px] border flex items-center justify-center cursor-pointer transition-[background] duration-150 ${t.navBtn}`}
-            aria-label="Previous day"
-            onClick={() => setSelectedDate(d => navigate(d, -1))}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
-          <button
-            className={`h-7 px-2 rounded-[7px] border text-[11px] font-medium cursor-pointer transition-[background] duration-150 ${t.navBtn}`}
-            aria-label="Go to today"
-            onClick={() => setSelectedDate(getLocalISODate())}
-          >
-            Today
-          </button>
-
-          <button
-            className={`w-7 h-7 rounded-[7px] border flex items-center justify-center cursor-pointer transition-[background] duration-150 ${t.navBtn}`}
-            aria-label="Next day"
-            onClick={() => setSelectedDate(d => navigate(d, 1))}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M4.5 2l4 4-4 4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+    <div className={`min-h-screen ${t.bg}`}>
+      <div className="mx-auto max-w-5xl px-4 pb-12 pt-16 sm:px-8 sm:pt-10">
+        <header className="mb-8 flex flex-wrap items-start justify-between gap-5">
+          <div><p className={`mb-2 text-xs font-semibold uppercase tracking-widest ${t.subheading}`}>Your workspace</p><h1 className={`text-3xl font-semibold tracking-tight ${t.heading}`}>Make room for what matters.</h1><p className={`mt-2 text-sm ${t.body}`}>Review your day, choose your next task, and keep moving.</p></div>
+          <Link href="/plans" className={button}><Sparkles size={16} className="mr-2" />Explore AI plans</Link>
+        </header>
+        <div className={`mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 ${t.border}`}>
+          <div className="flex items-center gap-2"><button aria-label="Previous day" className={button} onClick={() => setSelectedDate(d => navigate(d, -1))}><ChevronLeft size={18} /></button><button className={button} onClick={() => setSelectedDate(getLocalISODate())}>Today</button><button aria-label="Next day" className={button} onClick={() => setSelectedDate(d => navigate(d, 1))}><ChevronRight size={18} /></button></div>
+          <label className={`flex items-center gap-3 text-sm ${t.body}`}>Jump to date<input aria-label="Choose a day" type="date" value={selectedDate} onChange={e => { if (e.target.value) setSelectedDate(e.target.value) }} className={`min-h-11 rounded-lg border px-3 ${t.bg} ${t.border} ${t.heading}`} /></label>
         </div>
-
-        {/* Date label */}
-        <div className={`flex items-center gap-1.5 text-[12px] border rounded-lg px-2.5 py-[5px] ${t.datePill}`}>
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-            <rect x="1" y="2" width="11" height="10" rx="1.5" stroke="currentColor" strokeWidth="1" />
-            <path d="M4 1v2M9 1v2M1 5h11" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
-          </svg>
-          {selectedDate}
-        </div>
-      </header>
-
-      {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto px-6 py-5">
         <OverdueBanner theme={theme} />
-        <DayColumn
-          date={selectedDate}
-          onAddTask={(date) => console.log('Add task for', date)}
-        />
+        <DayColumn key={selectedDate} date={selectedDate} />
       </div>
     </div>
   )

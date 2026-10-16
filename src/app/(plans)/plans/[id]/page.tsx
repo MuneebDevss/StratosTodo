@@ -60,11 +60,17 @@ export default function PlanDetailPage() {
   const t = PAGE_THEME[theme]
   const router = useRouter()
 
-  const { data: plan, isLoading: planLoading, isError: planError } = usePlan(planId)
-  const { data: tasks, isLoading: tasksLoading } = usePlanTasks(planId)
-  const { mutate: deletePlan, isPending: isDeleting } = useDeletePlan()
+  const { data: plan, isLoading: planLoading, isError: planError, refetch: refetchPlan } = usePlan(planId)
+  const { data: tasks, isLoading: tasksLoading, isError: tasksError, refetch: refetchTasks } = usePlanTasks(planId)
+  const { mutate: deletePlan, isPending: isDeleting, isError: deleteError } = useDeletePlan()
 
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [filter, setFilter] = useState('all')
+  const completed = tasks?.filter(task => task.status === 'completed').length ?? 0
+  const pending = tasks?.filter(task => task.status === 'pending').length ?? 0
+  const progress = tasks?.length ? Math.round(completed / tasks.length * 100) : 0
+  const visibleTasks = (tasks ?? []).filter(task => filter === 'all' || task.status === filter)
+
 
   const handleDelete = () => {
     deletePlan(planId, {
@@ -78,13 +84,14 @@ export default function PlanDetailPage() {
   if (planError) {
     return (
       <div className={`min-h-screen ${t.bg}`}>
-        <div className="max-w-3xl mx-auto px-8 py-10">
+        <div className="max-w-5xl mx-auto px-4 pb-12 pt-16 sm:px-8 sm:pt-10">
           <Link href="/plans" className={`inline-flex items-center gap-1.5 text-sm mb-6 transition-colors duration-150 ${t.back}`}>
             <ArrowLeftIcon /> Back to plans
           </Link>
           <p className={`text-[14px] ${t.body}`}>
-            This plan couldn&apos;t be found — it may have already been deleted.
+            We couldn’t load this plan. Check your connection and try again.
           </p>
+          <button onClick={() => refetchPlan()} className="mt-4 min-h-11 rounded-lg border px-4 text-sm">Try again</button>
         </div>
       </div>
     )
@@ -94,7 +101,7 @@ export default function PlanDetailPage() {
 
   return (
     <div className={`min-h-screen ${t.bg}`}>
-      <div className="max-w-3xl mx-auto px-8 py-10">
+      <div className="max-w-5xl mx-auto px-4 pb-12 pt-16 sm:px-8 sm:pt-10">
         <Link href="/plans" className={`inline-flex items-center gap-1.5 text-sm mb-6 transition-colors duration-150 ${t.back}`}>
           <ArrowLeftIcon /> Back to plans
         </Link>
@@ -104,11 +111,11 @@ export default function PlanDetailPage() {
           <div className={`h-7 w-2/3 rounded-md animate-pulse mb-3 ${t.skeleton}`} />
         ) : plan ? (
           <header className="mb-8">
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <h1 className={`text-2xl font-bold ${t.heading}`}>{plan.title}</h1>
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+              <h1 className={`text-3xl font-semibold tracking-tight break-words ${t.heading}`}>{plan.title}</h1>
               <button
                 type="button"
-                className={`shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-[7px] border text-[12px] font-medium cursor-pointer transition-[background,color,border-color] duration-150 ${t.deleteBtn}`}
+                className={`shrink-0 inline-flex items-center gap-1.5 min-h-11 px-3 rounded-[7px] border text-[12px] font-medium cursor-pointer transition-[background,color,border-color] duration-150 ${t.deleteBtn}`}
                 onClick={() => setConfirmOpen(true)}
                 aria-label="Delete plan"
               >
@@ -129,26 +136,40 @@ export default function PlanDetailPage() {
           </header>
         ) : null}
 
+        {deleteError && <p role="alert" className="mb-4 rounded-lg bg-red-500/10 p-4 text-sm text-red-500">The plan could not be deleted. Please try again.</p>}
+        {!tasksLoading && !tasksError && tasks && (
+          <section aria-label="Plan progress" className={`mb-8 rounded-2xl border p-5 sm:p-6 ${t.border}`}>
+            <div className="grid grid-cols-3 gap-3">
+              {[['Total tasks', tasks.length], ['Completed', completed], ['To do', pending]].map(([label, value]) => <div key={label}><p className={`text-xs sm:text-sm ${t.subheading}`}>{label}</p><p className={`mt-2 text-2xl font-semibold ${t.heading}`}>{value}</p></div>)}
+            </div>
+            <div className={`mt-5 h-2 overflow-hidden rounded-full ${t.skeleton}`} role="progressbar" aria-label="Plan completion" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-indigo-500 transition-all" style={{ width: `${progress}%` }} /></div>
+            <p className={`mt-3 text-sm ${t.body}`}>{progress}% complete{tasks.length > 0 && completed === tasks.length ? ' · You’ve finished every task. Nicely done!' : ' · One task at a time.'}</p>
+          </section>
+        )}
         {/* ── Task list ── */}
         <div className={`pt-2 border-t mb-4 ${t.divider}`}>
           <h2 className={`text-[13px] font-medium mt-5 mb-3 ${t.subheading}`}>
-            {tasksLoading ? 'Tasks' : `${tasks?.length ?? 0} task${tasks?.length === 1 ? '' : 's'}`}
+            Tasks in this plan
           </h2>
         </div>
 
+        <div className="mb-5 flex flex-wrap gap-2" aria-label="Filter tasks">
+          {['all', 'pending', 'completed', 'graveyard'].map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} className={`min-h-11 rounded-lg border px-4 text-sm ${filter === value ? 'border-indigo-500 bg-indigo-500/10 text-indigo-500' : `${t.border} ${t.body}`}`}>{value === 'all' ? 'All tasks' : value === 'pending' ? 'To do' : value === 'completed' ? 'Completed' : 'Graveyard'}</button>)}
+        </div>
+        {tasksError && <div role="alert" className={`rounded-xl border p-6 ${t.border} ${t.body}`}><p>We couldn’t load the tasks for this plan.</p><button onClick={() => refetchTasks()} className="mt-3 min-h-11 rounded-lg border px-4 text-sm">Try again</button></div>}
         {tasksLoading && (
           <div className="flex flex-col gap-1.5">
             {Array.from({ length: 3 }).map((_, i) => <TaskSkeleton key={i} theme={theme} />)}
           </div>
         )}
 
-        {!tasksLoading && tasks && tasks.length === 0 && (
-          <p className={`text-[13px] ${t.subheading}`}>No tasks in this plan.</p>
+        {!tasksLoading && !tasksError && tasks && visibleTasks.length === 0 && (
+          <div className={`rounded-xl border border-dashed p-8 text-center ${t.border} ${t.body}`}><p className="font-medium">{tasks.length ? "No tasks in this view" : "This plan is ready for its first tasks"}</p><p className="mt-2 text-sm">{tasks.length ? "Choose another filter to see the rest of your plan." : "Ask Claude to add tasks to this plan so you can start tracking progress."}</p></div>
         )}
 
-        {!tasksLoading && tasks && tasks.length > 0 && (
+        {!tasksLoading && !tasksError && visibleTasks.length > 0 && (
           <div className="flex flex-col gap-1.5" role="list">
-            {tasks.map((task: Task) => (
+            {visibleTasks.map((task: Task) => (
               <div key={task.id} role="listitem">
                 <TaskCard task={task} theme={theme} />
               </div>

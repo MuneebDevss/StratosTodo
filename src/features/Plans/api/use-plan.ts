@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import type { Plan } from '../types'
+import type { Task } from '@/features/tasks/types'
 const PLAN_KEYS = {
   all: ['plans'] as const,
   lists: () => [...PLAN_KEYS.all, 'list'] as const,// used to fetch all plans
@@ -28,14 +29,14 @@ export function usePlan(planId: string) {
         return response.data
     },
   })
-}   
+}
 
 // Fetch tasks for a specific plan
 export function usePlanTasks(planId: string) {
     return useQuery({
         queryKey: PLAN_KEYS.tasks(planId),
         queryFn: async () => {
-            const response = await apiClient.get(`/plans/${planId}/tasks`);
+            const response = await apiClient.get<Task[]>(`/plans/${planId}/tasks`);
             return response.data;
         },
     });
@@ -45,7 +46,7 @@ export function usePlanTasks(planId: string) {
 export function useDeletePlan() {
     const qc = useQueryClient()
   return useMutation({
-    
+
     mutationFn: async (planId: string) => {
       await apiClient.delete(`/plans/${planId}`)
     },
