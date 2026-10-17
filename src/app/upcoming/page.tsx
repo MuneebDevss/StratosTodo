@@ -6,6 +6,8 @@ import { Task } from '@/features/tasks'
 import { DaySection } from '@/features/tasks/components/DaySection'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
+import { RescheduleDialog } from '@/features/tasks/components/RescheduleDialog'
+import type { RescheduleResult } from '@/features/tasks/api/use-reschedule'
 
 // Helper utilities for date management
 function parseISO(dateStr: string): Date {
@@ -43,6 +45,8 @@ export default function UpcomingPage() {
 
   const [activeDate, setActiveDate] = useState(() => formatLocalDate(new Date())) // <-- CHANGED
   const [windowSize, setWindowSize] = useState(14) // Start with 2 weeks, expand dynamically
+  const [isRescheduleDialogOpen, setIsRescheduleDialogOpen] = useState(false)
+  const [rescheduleResult, setRescheduleResult] = useState<RescheduleResult | null>(null)
 
   const { theme } = useTheme()
   const t = PAGE_THEME[theme]
@@ -146,6 +150,13 @@ export default function UpcomingPage() {
   return (
     <div className={`flex flex-col min-h-screen ${t.bg} ${t.body} font-sans antialiased selection:bg-orange-500/30`}>
 
+      <RescheduleDialog
+        open={isRescheduleDialogOpen}
+        theme={theme}
+        onClose={() => setIsRescheduleDialogOpen(false)}
+        onSuccess={setRescheduleResult}
+      />
+
       {/* STICKY HEADER AND CALENDAR STRIP */}
       <header className={`sticky top-0 ${t.bg} border-b ${t.border} pt-4 sm:pt-6 pb-2 px-4 sm:px-8 z-10`}>
         <div className="max-w-4xl mx-auto">
@@ -221,10 +232,18 @@ export default function UpcomingPage() {
                 </svg>
                 <h2 className="text-base sm:text-lg">Overdue</h2>
               </div>
-              <button className="text-xs text-[#ff544a] hover:underline font-semibold tracking-wide">
-                Reschedule
+              <button className="text-xs text-[#ff544a] hover:underline font-semibold tracking-wide" onClick={() => setIsRescheduleDialogOpen(true)}>
+                Reschedule Tasks
               </button>
             </div>
+
+            {rescheduleResult && (
+              <p className={`mb-3 rounded-lg px-3 py-2 text-sm ${t.panelBg} ${t.body}`} role="status">
+                {rescheduleResult.seatedCount} overdue task{rescheduleResult.seatedCount !== 1 ? 's were' : ' was'} rescheduled
+                {rescheduleResult.strategy ? ` using ${rescheduleResult.strategy === 'CDU' ? 'Complete Day Update' : rescheduleResult.strategy === 'HPF' ? 'High Priority First' : 'Fill Gaps'}` : ''}.
+                {rescheduleResult.graveyardCount > 0 ? ` ${rescheduleResult.graveyardCount} moved to the graveyard for review.` : ''}
+              </p>
+            )}
 
             <div className="space-y-1 pl-0 sm:pl-6">
               {overdueTasks.map((task: Task) => (

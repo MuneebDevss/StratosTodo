@@ -3,6 +3,7 @@ export { DayColumn } from './components/DayColumn'
 export { TaskCard } from './components/TaskCard'
 export { CapacityBar } from './components/CapacityBar'
 export { OverdueBanner } from './components/OverdueBanner'
+export { RescheduleDialog } from './components/RescheduleDialog'
 
 // API hooks
 export * from './api/use-tasks'

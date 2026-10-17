@@ -2,6 +2,7 @@ import { TASK_THEMES } from "@/Common/Constants/ThemeConstants"
 
 export type BasePriority = 'low' | 'medium' | 'high'
 export type TaskStatus = 'pending' | 'completed' | 'graveyard'
+export type RescheduleStrategy = 'CDU' | 'HPF' | 'FG'
 
 export interface Task {
   id: string

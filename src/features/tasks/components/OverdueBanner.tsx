@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from 'react'
+
 import { SIDEBAR_THEME, type ThemeKey } from '@/Common/Constants/ThemeConstants'
 import { useOverdueTasks } from '../api/use-tasks'
-import { useRunReschedule } from '../api/use-reschedule'
 import { useTheme } from '@/features/settings/hooks/use-theme'
+import { RescheduleDialog } from './RescheduleDialog'
+import type { RescheduleResult } from '../api/use-reschedule'
 
 interface OverdueBannerProps {
   theme?: ThemeKey
@@ -14,15 +17,16 @@ export function OverdueBanner({ theme: themeProp }: OverdueBannerProps) {
   const theme = themeProp ?? contextTheme
 
   const { data: overdueTasks = [] } = useOverdueTasks()
-  const { mutate: runReschedule, isPending, data: result } = useRunReschedule()
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [result, setResult] = useState<RescheduleResult | null>(null)
   const t = SIDEBAR_THEME[theme]
 
   if (overdueTasks.length === 0 && !result) return null
 
   const message = result
-    ? `${result.seatedCount} task${result.seatedCount !== 1 ? 's' : ''} rescheduled${
-        result.graveyardCount > 0 ? ` · ${result.graveyardCount} need review` : ''
-      }`
+    ? `${result.seatedCount} overdue task${result.seatedCount !== 1 ? 's were' : ' was'} rescheduled${
+        result.strategy ? ` using ${result.strategy === 'CDU' ? 'Complete Day Update' : result.strategy === 'HPF' ? 'High Priority First' : 'Fill Gaps'}` : ''
+      }${result.graveyardCount > 0 ? ` · ${result.graveyardCount} moved to the graveyard` : ''}`
     : `${overdueTasks.length} overdue task${overdueTasks.length !== 1 ? 's' : ''} from previous days`
 
   return (
@@ -42,13 +46,17 @@ export function OverdueBanner({ theme: themeProp }: OverdueBannerProps) {
       {!result && (
         <button
           className={`shrink-0 px-2.5 py-1 rounded-[6px] text-[12px] font-medium cursor-pointer transition-colors duration-150 disabled:opacity-50 ${t.overdueCta}`}
-          onClick={() => runReschedule()}
-          disabled={isPending}
-          aria-busy={isPending}
+          onClick={() => setIsDialogOpen(true)}
         >
-          {isPending ? 'Rescheduling…' : 'Reschedule now'}
+          Reschedule Tasks
         </button>
       )}
+      <RescheduleDialog
+        open={isDialogOpen}
+        theme={theme}
+        onClose={() => setIsDialogOpen(false)}
+        onSuccess={(nextResult) => setResult(nextResult)}
+      />
     </div>
   )
 }
