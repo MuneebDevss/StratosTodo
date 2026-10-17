@@ -315,9 +315,14 @@ export function TaskCard({
                       ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb] hover:shadow-[0_0_6px_rgba(59,91,219,0.3)]'
                       : 'border-[#c8c8d8] bg-transparent hover:border-[#1a6bff] hover:shadow-[0_0_6px_rgba(26,107,255,0.25)]'
                   }`}
-                onClick={(e) => { e.stopPropagation(); !visuallyCompleted && !isPending && complete({ id: task.id }) }}
-                disabled={isPending || visuallyCompleted}
-                aria-label={visuallyCompleted ? 'Completed' : 'Mark as complete'}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (isPending) return
+                  if (isCompleted) updateTask({ status: 'pending' })
+                  else complete({ id: task.id })
+                }}
+                disabled={isPending}
+                aria-label={isCompleted ? 'Mark as pending' : 'Mark as complete'}
               >
                 <AnimatePresence>
                   {visuallyCompleted && (

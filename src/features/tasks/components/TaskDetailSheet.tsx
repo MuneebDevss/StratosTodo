@@ -209,8 +209,12 @@ export function TaskDetailSheet({
                 <motion.button
                   whileTap={visuallyCompleted ? {} : { scale: 0.88 }}
                   whileHover={visuallyCompleted ? {} : { scale: 1.08 }}
-                  onClick={() => !visuallyCompleted && !isPending && complete({ id: task.id })}
-                  disabled={isPending || visuallyCompleted}
+                  onClick={() => {
+                    if (isPending) return
+                    if (isCompleted) updateTask({ status: 'pending' })
+                    else complete({ id: task.id })
+                  }}
+                  disabled={isPending}
                   className={`flex items-center justify-center w-[22px] h-[22px] rounded-[6px] border-2 transition-all duration-200 shrink-0
                     ${visuallyCompleted
                       ? 'bg-[#22b573] border-[#22b573] shadow-[0_0_10px_rgba(34,181,115,0.45)]'
@@ -218,7 +222,7 @@ export function TaskDetailSheet({
                         ? 'border-[#3a3a55] hover:border-[#3b5bdb] hover:shadow-[0_0_8px_rgba(59,91,219,0.35)]'
                         : 'border-[#c8c8d8] hover:border-[#1a6bff] hover:shadow-[0_0_8px_rgba(26,107,255,0.3)]'
                     }`}
-                  aria-label={visuallyCompleted ? 'Completed' : 'Mark as complete'}
+                  aria-label={isCompleted ? 'Mark as pending' : 'Mark as complete'}
                 >
                   <AnimatePresence>
                     {visuallyCompleted && (
@@ -480,18 +484,20 @@ export function TaskDetailSheet({
             {/* ── Footer Actions ── */}
             {!isEditing && (
               <div className={`px-6 py-4 border-t ${borderColor} shrink-0 flex gap-2`}>
-                {!isCompleted && (
-                  <button
-                    onClick={() => !isPending && complete({ id: task.id })}
-                    disabled={isPending}
-                    className={`flex-1 h-10 rounded-[10px] flex items-center justify-center gap-2 text-[13px] font-semibold border transition-colors disabled:opacity-50 ${completeBtnStyle}`}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Mark Complete
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    if (isPending) return
+                    if (isCompleted) updateTask({ status: 'pending' })
+                    else complete({ id: task.id })
+                  }}
+                  disabled={isPending}
+                  className={`flex-1 h-10 rounded-[10px] flex items-center justify-center gap-2 text-[13px] font-semibold border transition-colors disabled:opacity-50 ${completeBtnStyle}`}
+                >
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {isCompleted ? 'Mark Pending' : 'Mark Complete'}
+                </button>
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={isPending || isDeleting}

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import type { Task, TasksListParams, CreateTaskPayload, UpdateTaskPayload, DaySchedule } from '../types'
 import { getLocalISODate, getLocalISOStartOfDate } from '@/Common'
+import { PLAN_KEYS } from '@/features/Plans/api/use-plan'
 
 // Query keys - centralized for cache invalidation
 export const taskKeys = {
@@ -100,6 +101,9 @@ export function useUpdateTask(id: string, previousDate?: string) {
 
       // 4. Invalidate graveyard if it's there
       qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
+
+      // Plan detail pages fetch their task list under a separate query key.
+      qc.invalidateQueries({ queryKey: [...PLAN_KEYS.all, 'tasks'] })
     },
   })
 }
