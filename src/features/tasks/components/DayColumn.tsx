@@ -8,9 +8,9 @@ import { TaskEditShell } from './TaskEditShell'
 import { formatDayTitle } from '../utils/format'
 import type { DayColumnProps, EditFields } from '../types'
 import { useTheme } from '@/features/settings/hooks/use-theme'
+import { useUser } from '@/features/auth/api/use-user'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { AnimatePresence } from 'framer-motion'
-import { getLocalISOStartOfDate } from '@/Common'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -23,8 +23,9 @@ const EMPTY_FIELDS: EditFields = {
 
 
 export function DayColumn({ date }: DayColumnProps) {
-  const { data: schedule, isLoading, isError, refetch } = useDaySchedule(getLocalISOStartOfDate(new Date(date), true))
+  const { data: schedule, isLoading, isError, refetch } = useDaySchedule(date)
   const { main, sub } = formatDayTitle(date)
+  const { data: user } = useUser()
 
   const { theme } = useTheme()
   const t = PAGE_THEME[theme]
@@ -40,7 +41,7 @@ export function DayColumn({ date }: DayColumnProps) {
   const fitsToday = new Set(schedule?.tasksCompletableToday ?? [])
   const hasOverflow = Boolean(schedule?.isCurrentDay && minutesLeft > (schedule?.todayAvailableMinutes ?? 0))
   const projectedCompletion = schedule?.projectedCompletionAt
-    ? new Date(schedule.projectedCompletionAt).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })
+    ? new Date(schedule.projectedCompletionAt).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: user?.timezone || undefined })
     : null
 
   // ── Inline create ──
@@ -93,7 +94,7 @@ export function DayColumn({ date }: DayColumnProps) {
           )}
         </div>
         <div className={`px-3 py-1 text-xs font-medium rounded-full border ${t.bg} ${t.subheading} ${t.border}`}>
-          {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          {new Date(`${date}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
         </div>
       </div>
 
@@ -205,7 +206,12 @@ export function DayColumn({ date }: DayColumnProps) {
               {pending.map((task) => (
                 <div key={task.id} role="listitem">
                   <AnimatePresence>
-                    <TaskCard task={task} theme={theme} canFinishToday={hasOverflow && fitsToday.has(task.id)} />
+                    <TaskCard
+                      task={task}
+                      theme={theme}
+                      canFinishToday={hasOverflow && fitsToday.has(task.id)}
+                      spillsOverToday={hasOverflow && !fitsToday.has(task.id)}
+                    />
                   </AnimatePresence>
                 </div>
               ))}

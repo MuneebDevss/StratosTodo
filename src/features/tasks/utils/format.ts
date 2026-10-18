@@ -88,7 +88,9 @@ export function formatSectionHeading(dateStr: string): string {
 }
 
 export function formatDayTitle(dateStr: string): { main: string; sub: string } {
-  const d = new Date(dateStr)
+  // A dashboard date is a calendar date, so parse it in the browser's local
+  // timezone instead of letting Date interpret YYYY-MM-DD as UTC midnight.
+  const d = new Date(`${dateStr}T00:00:00`)
   const today = isToday(dateStr)
   const sub = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   return {

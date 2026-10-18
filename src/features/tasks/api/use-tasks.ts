@@ -15,6 +15,10 @@ export const taskKeys = {
   schedule: (date: string) => [...taskKeys.all, 'schedule', date] as const,
 }
 
+function taskDateKey(date: string): string {
+  return date.slice(0, 10)
+}
+
 // Fetch tasks with optional filters
 export function useTasks(params: TasksListParams = {}) {
   return useQuery({
@@ -77,7 +81,7 @@ export function useCreateTask() {
       apiClient.post<Task>('/tasks', { ...payload, scheduleDate: getLocalISOStartOfDate(new Date(payload.scheduleDate), true) }).then((r) => r.data),
     onSuccess: (task) => {
       // Invalidate the schedule for the task's date + list queries
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(taskDateKey(task.scheduledDate)) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
     },
   })
@@ -93,7 +97,7 @@ export function useUpdateTask(id: string, previousDate?: string) {
     onSuccess: (task) => {
       qc.setQueryData(taskKeys.detail(id), task)
 
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(task.scheduledDate) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(taskDateKey(task.scheduledDate)) })
 
       // 3. Invalidate lists and overdue
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
@@ -115,7 +119,7 @@ export function useDeleteTask() {
     mutationFn: ({ id, date }: { id: string; date: string }) =>
       apiClient.delete(`/tasks/${id}`).then(() => ({ id, date })),
     onSuccess: ({ date }) => {
-      qc.invalidateQueries({ queryKey: taskKeys.schedule(date) })
+      qc.invalidateQueries({ queryKey: taskKeys.schedule(taskDateKey(date)) })
       qc.invalidateQueries({ queryKey: taskKeys.lists() })
       qc.invalidateQueries({ queryKey: taskKeys.graveyard() })
     },

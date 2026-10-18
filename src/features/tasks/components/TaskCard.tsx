@@ -59,6 +59,7 @@ export function TaskCard({
   task,
   theme: externalTheme,
   canFinishToday = false,
+  spillsOverToday = false,
 }: TaskCardProps) {
   const { mutate: complete, isPending: isCompleting } = useCompleteTask()
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask()
@@ -246,6 +247,11 @@ export function TaskCard({
           ${isCompleted && !isEditing ? 'opacity-70' : ''}
           ${canFinishToday && !isCompleted && !isEditing
             ? theme === 'dark'
+              ? 'ring-1 ring-emerald-400/70 bg-emerald-950/20'
+              : 'ring-1 ring-emerald-500/70 bg-emerald-50/70'
+            : ''}
+          ${spillsOverToday && !isCompleted && !isEditing
+            ? theme === 'dark'
               ? 'ring-1 ring-amber-400/70 bg-amber-950/20'
               : 'ring-1 ring-amber-500/70 bg-amber-50/70'
             : ''}
@@ -255,8 +261,13 @@ export function TaskCard({
         aria-label={`Task: ${task.title}`}
         >
         {canFinishToday && !isCompleted && !isEditing && (
-          <span className={`absolute right-3 top-2 z-20 rounded-full px-2 py-0.5 text-[10px] font-semibold ${theme === 'dark' ? 'bg-amber-900/80 text-amber-200' : 'bg-amber-100 text-amber-800'}`}>
+          <span className={`absolute right-3 top-2 z-20 rounded-full px-2 py-0.5 text-[10px] font-semibold ${theme === 'dark' ? 'bg-emerald-900/80 text-emerald-200' : 'bg-emerald-100 text-emerald-800'}`}>
             Fits today
+          </span>
+        )}
+        {spillsOverToday && !isCompleted && !isEditing && (
+          <span className={`absolute right-3 top-2 z-20 rounded-full px-2 py-0.5 text-[10px] font-semibold ${theme === 'dark' ? 'bg-amber-900/80 text-amber-200' : 'bg-amber-100 text-amber-800'}`}>
+            Spills over
           </span>
         )}
         {/* ── Liquid Ocean Fill Layer ── */}

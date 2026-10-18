@@ -80,6 +80,7 @@ export interface TaskCardProps {
   task: Task
   theme?: 'light' | 'dark'
   canFinishToday?: boolean
+  spillsOverToday?: boolean
 }
 
 export interface DayColumnProps {
