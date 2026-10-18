@@ -58,6 +58,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void)
 export function TaskCard({
   task,
   theme: externalTheme,
+  canFinishToday = false,
 }: TaskCardProps) {
   const { mutate: complete, isPending: isCompleting } = useCompleteTask()
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask()
@@ -243,11 +244,21 @@ export function TaskCard({
           ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl cursor-grabbing` : `${pageTheme.bg} cursor-pointer`}
           ${isEditing ? 'cursor-default' : ''}
           ${isCompleted && !isEditing ? 'opacity-70' : ''}
+          ${canFinishToday && !isCompleted && !isEditing
+            ? theme === 'dark'
+              ? 'ring-1 ring-amber-400/70 bg-amber-950/20'
+              : 'ring-1 ring-amber-500/70 bg-amber-50/70'
+            : ''}
           ${isSheetOpen && !isEditing ? (theme === 'dark' ? 'ring-1 ring-[#3b5bdb]/25' : 'ring-1 ring-[#1a6bff]/20') : ''}
         `}
         role="article"
         aria-label={`Task: ${task.title}`}
-      >
+        >
+        {canFinishToday && !isCompleted && !isEditing && (
+          <span className={`absolute right-3 top-2 z-20 rounded-full px-2 py-0.5 text-[10px] font-semibold ${theme === 'dark' ? 'bg-amber-900/80 text-amber-200' : 'bg-amber-100 text-amber-800'}`}>
+            Fits today
+          </span>
+        )}
         {/* ── Liquid Ocean Fill Layer ── */}
         {!isEditing && (
           <motion.div

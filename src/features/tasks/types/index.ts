@@ -25,6 +25,13 @@ export interface DaySchedule {
   tasks: Task[]
   totalScheduledMinutes: number
   dailyCapacityMinutes: number
+  completedMinutes: number
+  pendingMinutes: number
+  minutesLeft: number
+  isCurrentDay: boolean
+  todayAvailableMinutes: number
+  tasksCompletableToday: string[]
+  projectedCompletionAt: string | null
 }
 
 export interface TasksListParams {
@@ -72,6 +79,7 @@ export interface TaskEditShellProps {
 export interface TaskCardProps {
   task: Task
   theme?: 'light' | 'dark'
+  canFinishToday?: boolean
 }
 
 export interface DayColumnProps {

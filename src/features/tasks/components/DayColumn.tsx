@@ -35,6 +35,13 @@ export function DayColumn({ date }: DayColumnProps) {
   const completed = tasks.filter((t) => t.status === 'completed')
   const usedMinutes = schedule?.totalScheduledMinutes ?? 0
   const totalMinutes = schedule?.dailyCapacityMinutes ?? 480
+  const completedMinutes = schedule?.completedMinutes ?? completed.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)
+  const minutesLeft = schedule?.minutesLeft ?? pending.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)
+  const fitsToday = new Set(schedule?.tasksCompletableToday ?? [])
+  const hasOverflow = Boolean(schedule?.isCurrentDay && minutesLeft > (schedule?.todayAvailableMinutes ?? 0))
+  const projectedCompletion = schedule?.projectedCompletionAt
+    ? new Date(schedule.projectedCompletionAt).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })
+    : null
 
   // ── Inline create ──
   const { mutate: createTask, isPending: isCreating } = useCreateTask()
@@ -132,7 +139,7 @@ export function DayColumn({ date }: DayColumnProps) {
             </div>
             <div className="flex justify-between text-xs">
               <span className={t.body}>
-                {completed.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)} of {tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0)} minutes completed
+                {completedMinutes} of {completedMinutes + minutesLeft} minutes completed · {minutesLeft} minutes left
               </span>
               <span className={t.subheading}>
                 {tasks.reduce((sum, task) => sum + (task.estimatedMinutes || 0), 0) > 0 
@@ -141,6 +148,15 @@ export function DayColumn({ date }: DayColumnProps) {
               </span>
             </div>
           </div>
+        </div>
+      )}
+
+      {!isLoading && !isError && schedule?.isCurrentDay && tasks.length > 0 && projectedCompletion && (
+        <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${hasOverflow
+          ? theme === 'dark' ? 'border-amber-800 bg-amber-950/30 text-amber-200' : 'border-amber-200 bg-amber-50 text-amber-900'
+          : theme === 'dark' ? 'border-emerald-800 bg-emerald-950/30 text-emerald-200' : 'border-emerald-200 bg-emerald-50 text-emerald-900'}`}>
+          <p className="font-semibold">{hasOverflow ? `All pending tasks finish around ${projectedCompletion}.` : `All pending tasks can finish by ${projectedCompletion}.`}</p>
+          {hasOverflow && <p className="mt-1 text-xs opacity-85">{fitsToday.size} of {pending.length} pending tasks fit in today’s remaining window. Highlighted tasks are the maximum count that can be completed today.</p>}
         </div>
       )}
 
@@ -189,7 +205,7 @@ export function DayColumn({ date }: DayColumnProps) {
               {pending.map((task) => (
                 <div key={task.id} role="listitem">
                   <AnimatePresence>
-                    <TaskCard task={task} theme={theme} />
+                    <TaskCard task={task} theme={theme} canFinishToday={hasOverflow && fitsToday.has(task.id)} />
                   </AnimatePresence>
                 </div>
               ))}
