@@ -87,6 +87,7 @@ export function TaskDetailSheet({
   const pColors = PRIORITY_COLORS[task.basePriority]
 
   const isCompleted = task.status === 'completed'
+  const isDiscarded = task.status === 'discarded'
   const visuallyCompleted = isCompleted || isCompleting
   const isPending = isCompleting || isDeleting || isUpdating
 
@@ -211,7 +212,7 @@ export function TaskDetailSheet({
                   whileHover={visuallyCompleted ? {} : { scale: 1.08 }}
                   onClick={() => {
                     if (isPending) return
-                    if (isCompleted) updateTask({ status: 'pending' })
+                    if (isCompleted || isDiscarded) updateTask({ status: 'pending' })
                     else complete({ id: task.id })
                   }}
                   disabled={isPending}
@@ -222,7 +223,7 @@ export function TaskDetailSheet({
                         ? 'border-[#3a3a55] hover:border-[#3b5bdb] hover:shadow-[0_0_8px_rgba(59,91,219,0.35)]'
                         : 'border-[#c8c8d8] hover:border-[#1a6bff] hover:shadow-[0_0_8px_rgba(26,107,255,0.3)]'
                     }`}
-                  aria-label={isCompleted ? 'Mark as pending' : 'Mark as complete'}
+                  aria-label={isDiscarded ? 'Undiscard task' : isCompleted ? 'Mark as pending' : 'Mark as complete'}
                 >
                   <AnimatePresence>
                     {visuallyCompleted && (
@@ -239,7 +240,7 @@ export function TaskDetailSheet({
                   </AnimatePresence>
                 </motion.button>
                 <span className={`text-[13px] font-semibold ${theme === 'dark' ? 'text-[#5a5a80]' : 'text-[#9898b0]'}`}>
-                  {isCompleted ? 'Completed' : 'Task Details'}
+                  {isDiscarded ? 'Discarded' : isCompleted ? 'Completed' : 'Task Details'}
                 </span>
               </div>
               {/* Close button */}
@@ -394,7 +395,7 @@ export function TaskDetailSheet({
                 <div className={`h-px w-full ${dividerColor}`} />
 
                 {/* ── Timer Section ── */}
-                {!isCompleted && (
+                {!isCompleted && !isDiscarded && (
                   <div>
                     <SectionLabel theme={theme}>Focus Timer</SectionLabel>
 
@@ -487,7 +488,7 @@ export function TaskDetailSheet({
                 <button
                   onClick={() => {
                     if (isPending) return
-                    if (isCompleted) updateTask({ status: 'pending' })
+                    if (isCompleted || isDiscarded) updateTask({ status: 'pending' })
                     else complete({ id: task.id })
                   }}
                   disabled={isPending}
@@ -496,7 +497,7 @@ export function TaskDetailSheet({
                   <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
                     <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  {isCompleted ? 'Mark Pending' : 'Mark Complete'}
+                  {isDiscarded ? 'Undiscard' : isCompleted ? 'Mark Pending' : 'Mark Complete'}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(true)}

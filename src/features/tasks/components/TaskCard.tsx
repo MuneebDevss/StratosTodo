@@ -122,15 +122,15 @@ export function TaskCard({
   }
 
   const isCompleted = task.status === 'completed'
+  const isDiscarded = task.status === 'discarded'
   const isPending = isCompleting || isDeleting || isUpdating
   const priority = PRIORITY_CONFIG[task.basePriority]
   const hasDesc = !!task.description?.trim()
   // 1. Define the optimistic check state above your JSX
-  const visuallyCompleted = isCompleted || isCompleting;
 
   // ── Timer Handlers ──
   useEffect(() => {
-    if (!isTimerRunning || isCompleted) return
+    if (!isTimerRunning || isCompleted || isDiscarded) return
 
     const updateTime = () => {
       if (startTimeRef.current !== null) {
@@ -157,7 +157,7 @@ export function TaskCard({
       clearInterval(intervalId)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isTimerRunning, isCompleted])
+  }, [isTimerRunning, isCompleted, isDiscarded])
 
   const handleStart = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -225,7 +225,7 @@ export function TaskCard({
       className="relative group/task"
     >
       {/* ── Drag handle ── */}
-      {!isEditing && !isCompleted && (
+      {!isEditing && !isCompleted && !isDiscarded && (
         <div
           className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full pl-1 pr-2 py-2 opacity-0 group-hover/task:opacity-100 group-hover/task:-translate-x-[110%] transition-all duration-200 ${t.dragHandle}`}
           aria-label="Drag to reschedule"
@@ -239,15 +239,15 @@ export function TaskCard({
       <motion.div
         layout
         ref={cardRef}
-        draggable={!isEditing && !isCompleted}
+        draggable={!isEditing && !isCompleted && !isDiscarded}
         onDragStartCapture={handleDragStart}
         onDragEndCapture={handleDragEnd}
         onClick={handleCardClick}
-        onDoubleClick={() => { if (!isCompleted && !isPending) setIsEditing(true) }}
+        onDoubleClick={() => { if (!isCompleted && !isDiscarded && !isPending) setIsEditing(true) }}
         className={`relative overflow-hidden z-0 flex flex-col gap-3 py-3 transition-all duration-200 select-none touch-pan-y
           ${isDragging ? `${t.cardDragging} rotate-[2deg] scale-[1.02] shadow-2xl cursor-grabbing` : `${pageTheme.bg} cursor-pointer`}
           ${isEditing ? 'cursor-default' : ''}
-          ${isCompleted && !isEditing ? 'opacity-70' : ''}
+          ${isCompleted || isDiscarded ? 'opacity-70' : ''}
           ${canFinishToday && !isCompleted && !isEditing
             ? theme === 'dark'
               ? 'ring-1 ring-emerald-400/70 bg-emerald-950/20'
@@ -329,49 +329,12 @@ export function TaskCard({
         {!isEditing && (
           <div className="relative z-10 flex flex-col gap-3 w-full h-full">
             <div className="flex items-start gap-3">
-              {/* Selection checkbox */}
+              {/* Selection action */}
               {selectable && (
-                <button type="button" aria-label={selected ? 'Deselect task' : 'Select task'} aria-pressed={selected} onClick={(e) => { e.stopPropagation(); onSelect?.(!selected) }} className={`mt-[2px] h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] ${selected ? 'border-rose-500 bg-rose-500' : theme === 'dark' ? 'border-[#3a3a55]' : 'border-[#c8c8d8]'}`}>
-                  {selected && <span className="text-[12px] font-bold text-white">✓</span>}
+                <button type="button" aria-label={selected ? 'Deselect task' : 'Select task'} aria-pressed={selected} onClick={(e) => { e.stopPropagation(); onSelect?.(!selected) }} className={`mt-0.5 shrink-0 rounded-md border px-1.5 py-1 text-[10px] font-semibold ${selected ? 'border-rose-500 bg-rose-500 text-white' : theme === 'dark' ? 'border-[#3a3a55] text-[#9090b0]' : 'border-[#c8c8d8] text-[#6b6b80]'}`}>
+                  {selected ? 'Selected' : 'Select'}
                 </button>
               )}
-              {/* Completion checkbox */}
-              <motion.button
-                whileTap={visuallyCompleted ? {} : { scale: 0.82 }}
-                whileHover={visuallyCompleted ? {} : { scale: 1.1 }}
-                className={`mt-[2px] w-[18px] h-[18px] rounded-[5px] border-[1.5px] shrink-0 flex items-center justify-center cursor-pointer transition-[border-color,background,box-shadow] duration-150 p-0
-                  ${visuallyCompleted
-                    ? 'bg-[#22b573] border-[#22b573] shadow-[0_0_8px_rgba(34,181,115,0.4)]'
-                    : theme === 'dark'
-                      ? 'border-[#3a3a55] bg-transparent hover:border-[#3b5bdb] hover:shadow-[0_0_6px_rgba(59,91,219,0.3)]'
-                      : 'border-[#c8c8d8] bg-transparent hover:border-[#1a6bff] hover:shadow-[0_0_6px_rgba(26,107,255,0.25)]'
-                  }`}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (isPending) return
-                  if (isCompleted) updateTask({ status: 'pending' })
-                  else complete({ id: task.id })
-                }}
-                disabled={isPending}
-                aria-label={isCompleted ? 'Mark as pending' : 'Mark as complete'}
-              >
-                <AnimatePresence>
-                  {visuallyCompleted && (
-                    <motion.svg
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                      width="11"
-                      height="11"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                    >
-                      <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </motion.svg>
-                  )}
-                </AnimatePresence>
-              </motion.button>
 
               {/* Body */}
               <div className="flex-1 min-w-0">
@@ -379,7 +342,7 @@ export function TaskCard({
                   layout
                   animate={isCompleted ? { opacity: .55, scale: .98 } : { opacity: 1, scale: 1 }}
                   className={`text-[14px] font-semibold leading-snug whitespace-nowrap overflow-hidden text-ellipsis mb-1.5
-                    ${isCompleted ? t.titleCompleted : t.title}
+                    ${isCompleted || isDiscarded ? t.titleCompleted : t.title}
                   `}
                 >
                   {task.title}
@@ -434,7 +397,6 @@ export function TaskCard({
                       </AnimatePresence>
                     </button>
                   </motion.div>
-
                   {/* Bump & Plan badges */}
                   {task.bumpCount > 0 && (
                     <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-[5px] ${t.chipBump}`} title={`Rescheduled ${task.bumpCount} time${task.bumpCount > 1 ? 's' : ''}`}>
@@ -453,7 +415,20 @@ export function TaskCard({
 
               {/* Score + open-sheet hint */}
               <div className="flex flex-col items-end gap-1 shrink-0 ml-auto">
-                <span className={`text-[10px] relative z-10 ${t.score}`}>{task.compositeScore.toFixed(1)}</span>
+                {/* Completion action */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (isPending) return
+                    if (isDiscarded || isCompleted) updateTask({ status: 'pending' })
+                    else complete({ id: task.id })
+                  }}
+                  disabled={isPending}
+                  aria-label={isDiscarded ? 'Discarded task' : isCompleted ? 'Mark as pending' : 'Mark as complete'}
+                  className={`mt-0.5 shrink-0 rounded-md border px-2 py-1 text-[10px] font-semibold transition-colors ${isCompleted ? 'border-[#22b573]/40 bg-[#22b573]/10 text-[#22b573]' : isDiscarded ? 'border-rose-500/30 bg-rose-500/10 text-rose-500' : theme === 'dark' ? 'border-[#3a3a55] text-[#9090b0] hover:border-[#3b5bdb]' : 'border-[#c8c8d8] text-[#6b6b80] hover:border-[#1a6bff]'}`}
+                >
+                  {isDiscarded ? 'Undiscard' : isCompleted ? 'Mark Pending' : 'Done'}
+                </button>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className={`opacity-0 group-hover/task:opacity-60 transition-opacity ${theme === 'dark' ? 'text-[#5a5a80]' : 'text-[#9898a8]'}`}>
                   <path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -465,6 +440,9 @@ export function TaskCard({
               <motion.div layout className="pl-[30px]">
                 <p className={`text-[12px] leading-relaxed line-clamp-2 ${t.description}`}>{task.description}</p>
               </motion.div>
+            )}
+            {isDiscarded && task.discardReason && (
+              <p className={`pl-[30px] text-[11px] italic ${t.description}`}>Discard reason: {task.discardReason}</p>
             )}
           </div>
         )}

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 
 import { useUpcoming } from '@/features/tasks/hooks/use-upcoming'
-import { Task } from '@/features/tasks'
+import { Task, TaskCard, useTasks } from '@/features/tasks'
 import { DaySection } from '@/features/tasks/components/DaySection'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
@@ -47,12 +47,14 @@ export default function UpcomingPage() {
   const [windowSize, setWindowSize] = useState(14) // Start with 2 weeks, expand dynamically
   const [isRescheduleDialogOpen, setIsRescheduleDialogOpen] = useState(false)
   const [rescheduleResult, setRescheduleResult] = useState<RescheduleResult | null>(null)
+  const [view, setView] = useState<'upcoming' | 'discarded'>('upcoming')
 
   const { theme } = useTheme()
   const t = PAGE_THEME[theme]
 
 
   const { dayGroups, isLoading, overdueTasks } = useUpcoming(windowStart, windowSize)
+  const { data: discardedTasks = [], isLoading: discardedLoading } = useTasks({ status: 'discarded' })
 
   // 1. Calculate the active month/year text dynamically
   const displayMonthYear = useMemo(() => {
@@ -216,11 +218,21 @@ export default function UpcomingPage() {
               )
             })}
           </div>
+          <div className="mt-3 flex gap-2" role="tablist" aria-label="Upcoming task view">
+            <button role="tab" aria-selected={view === 'upcoming'} onClick={() => setView('upcoming')} className={`rounded-lg px-3 py-2 text-xs font-semibold ${view === 'upcoming' ? 'bg-orange-500 text-white' : `${t.sidebarHoverBg} ${t.subheading}`}`}>Upcoming</button>
+            <button role="tab" aria-selected={view === 'discarded'} onClick={() => setView('discarded')} className={`rounded-lg px-3 py-2 text-xs font-semibold ${view === 'discarded' ? 'bg-rose-500 text-white' : `${t.sidebarHoverBg} ${t.subheading}`}`}>Discarded ({discardedTasks.length})</button>
+          </div>
         </div>
       </header>
 
       {/* MAIN TASK SCROLL VIEW CONTAINER */}
       <main className={`max-w-4xl mx-auto w-full px-4 sm:px-8 py-6 flex-1 ${t.bg}`}>
+        {view === 'discarded' ? (
+          <section aria-label="Discarded tasks" className="space-y-3">
+            <h2 className={`text-lg font-semibold ${t.heading}`}>Discarded tasks</h2>
+            {discardedLoading ? <p className={t.subheading}>Loading discarded tasks…</p> : discardedTasks.length === 0 ? <p className={t.body}>No discarded tasks.</p> : discardedTasks.map((task: Task) => <TaskCard key={task.id} task={task} theme={theme} />)}
+          </section>
+        ) : <>
 
         {/* OVERDUE COMPONENT SECTION */}
         {overdueTasks.length > 0 && (
@@ -304,6 +316,7 @@ export default function UpcomingPage() {
             </div>
           )}
         </div>
+        </>}
       </main>
     </div>
   )

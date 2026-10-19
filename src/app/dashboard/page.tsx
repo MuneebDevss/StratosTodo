@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
-import { DayColumn, OverdueBanner } from '@/features/tasks'
+import { DayColumn, OverdueBanner, TaskCard, useTasks } from '@/features/tasks'
+import type { Task } from '@/features/tasks'
 import { useTheme } from '@/features/settings/hooks/use-theme'
 import { getLocalISODate, navigate } from '@/Common'
 import { PAGE_THEME } from '@/Common/Constants/ThemeConstants'
 
 export default function DashboardPage() {
   const [selectedDate, setSelectedDate] = useState(() => getLocalISODate())
+  const [view, setView] = useState<'today' | 'discarded'>('today')
+  const { data: discardedTasks = [], isLoading: discardedLoading } = useTasks({ status: 'discarded' })
   const { theme } = useTheme()
   const t = PAGE_THEME[theme]
   useEffect(() => {
@@ -37,7 +40,15 @@ export default function DashboardPage() {
           <label className={`flex items-center gap-3 text-sm ${t.body}`}>Jump to date<input aria-label="Choose a day" type="date" value={selectedDate} onChange={e => { if (e.target.value) setSelectedDate(e.target.value) }} className={`min-h-11 rounded-lg border px-3 ${t.bg} ${t.border} ${t.heading}`} /></label>
         </div>
         <OverdueBanner theme={theme} />
-        <DayColumn key={selectedDate} date={selectedDate} />
+        <div className={`mb-6 flex gap-2 border-b ${t.border}`} role="tablist" aria-label="Task view">
+          <button role="tab" aria-selected={view === 'today'} onClick={() => setView('today')} className={`border-b-2 px-3 py-2 text-sm font-medium ${view === 'today' ? 'border-indigo-500 text-indigo-500' : `border-transparent ${t.subheading}`}`}>Today</button>
+          <button role="tab" aria-selected={view === 'discarded'} onClick={() => setView('discarded')} className={`border-b-2 px-3 py-2 text-sm font-medium ${view === 'discarded' ? 'border-rose-500 text-rose-500' : `border-transparent ${t.subheading}`}`}>Discarded ({discardedTasks.length})</button>
+        </div>
+        {view === 'today' ? <DayColumn key={selectedDate} date={selectedDate} /> : (
+          <section aria-label="Discarded tasks" className="space-y-2">
+            {discardedLoading ? <p className={t.subheading}>Loading discarded tasks…</p> : discardedTasks.length === 0 ? <p className={t.body}>No discarded tasks.</p> : discardedTasks.map((task: Task) => <TaskCard key={task.id} task={task} theme={theme} />)}
+          </section>
+        )}
       </div>
     </div>
   )
