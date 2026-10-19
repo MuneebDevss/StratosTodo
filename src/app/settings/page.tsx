@@ -171,7 +171,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={() => 
                   logout(undefined, {
-                    onSuccess: () => {
+                    onSettled: () => {
                       router.push('/login');
                     }
                   })}

@@ -1,7 +1,7 @@
 import { TASK_THEMES } from "@/Common/Constants/ThemeConstants"
 
 export type BasePriority = 'low' | 'medium' | 'high'
-export type TaskStatus = 'pending' | 'completed' | 'graveyard'
+export type TaskStatus = 'pending' | 'completed' | 'graveyard' | 'discarded'
 export type RescheduleStrategy = 'CDU' | 'HPF' | 'FG'
 
 export interface Task {
@@ -16,6 +16,7 @@ export interface Task {
   compositeScore: number // computed by backend
   bumpCount: number
   status: TaskStatus
+  discardReason: string | null
   createdAt: string
   updatedAt: string
 }
@@ -81,6 +82,9 @@ export interface TaskCardProps {
   theme?: 'light' | 'dark'
   canFinishToday?: boolean
   spillsOverToday?: boolean
+  selectable?: boolean
+  selected?: boolean
+  onSelect?: (selected: boolean) => void
 }
 
 export interface DayColumnProps {

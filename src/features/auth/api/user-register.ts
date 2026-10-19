@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@/lib/api-client';
+import { apiClient, setTokens } from '@/lib/api-client';
 import { USER_QUERY_KEY } from './use-user';
 
 export function useRegister() {
@@ -9,7 +9,8 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: async (registrationData: Record<string, string>) => {
-      const { data } = await apiClient.post('/auth/register', registrationData);
+      const { data } = await apiClient.post<{ accessToken: string; refreshToken: string; user: unknown }>('/auth/register', registrationData);
+      setTokens(data.accessToken, data.refreshToken);
       return data;
     },
     onSuccess: (data ) => {

@@ -11,6 +11,7 @@ import { useTheme } from '@/features/settings/hooks/use-theme'
 import { useUser } from '@/features/auth/api/use-user'
 import { PAGE_THEME, TASK_THEMES } from '@/Common/Constants/ThemeConstants'
 import { AnimatePresence } from 'framer-motion'
+import { DiscardTasksDialog } from './DiscardTasksDialog'
 
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -48,6 +49,8 @@ export function DayColumn({ date }: DayColumnProps) {
   const { mutate: createTask, isPending: isCreating } = useCreateTask()
   const [isAdding, setIsAdding] = useState(false)
   const [fields, setFields] = useState<EditFields>(EMPTY_FIELDS)
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false)
 
   const openShell = () => {
     setFields(EMPTY_FIELDS)
@@ -187,6 +190,13 @@ export function DayColumn({ date }: DayColumnProps) {
       {!isLoading && !isError && (
         <div className="flex-1 flex flex-col">
 
+          {selectedTaskIds.length > 0 && (
+            <div className={`mb-4 flex items-center justify-between rounded-xl border px-4 py-3 ${t.border} ${t.bg}`}>
+              <span className={`text-sm ${t.body}`}>{selectedTaskIds.length} task{selectedTaskIds.length === 1 ? '' : 's'} selected</span>
+              <div className="flex gap-2"><button onClick={() => setSelectedTaskIds([])} className={`rounded-lg border px-3 py-2 text-xs ${t.border} ${t.body}`}>Clear</button><button onClick={() => setShowDiscardDialog(true)} className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white">Discard selected</button></div>
+            </div>
+          )}
+
           {/* Pending section */}
           <div className="flex-1">
             {pending.length > 0 && (
@@ -211,6 +221,9 @@ export function DayColumn({ date }: DayColumnProps) {
                       theme={theme}
                       canFinishToday={hasOverflow && fitsToday.has(task.id)}
                       spillsOverToday={hasOverflow && !fitsToday.has(task.id)}
+                      selectable
+                      selected={selectedTaskIds.includes(task.id)}
+                      onSelect={(selected) => setSelectedTaskIds(ids => selected ? [...ids, task.id] : ids.filter(id => id !== task.id))}
                     />
                   </AnimatePresence>
                 </div>
@@ -281,6 +294,7 @@ export function DayColumn({ date }: DayColumnProps) {
 
         </div>
       )}
+      <DiscardTasksDialog taskIds={selectedTaskIds} taskCount={selectedTaskIds.length} open={showDiscardDialog} theme={theme} onClose={() => { setShowDiscardDialog(false); setSelectedTaskIds([]) }} />
     </div>
   )
 }

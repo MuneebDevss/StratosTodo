@@ -60,6 +60,9 @@ export function TaskCard({
   theme: externalTheme,
   canFinishToday = false,
   spillsOverToday = false,
+  selectable = false,
+  selected = false,
+  onSelect,
 }: TaskCardProps) {
   const { mutate: complete, isPending: isCompleting } = useCompleteTask()
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask()
@@ -326,7 +329,13 @@ export function TaskCard({
         {!isEditing && (
           <div className="relative z-10 flex flex-col gap-3 w-full h-full">
             <div className="flex items-start gap-3">
-              {/* Checkbox */}
+              {/* Selection checkbox */}
+              {selectable && (
+                <button type="button" aria-label={selected ? 'Deselect task' : 'Select task'} aria-pressed={selected} onClick={(e) => { e.stopPropagation(); onSelect?.(!selected) }} className={`mt-[2px] h-[18px] w-[18px] shrink-0 rounded-[5px] border-[1.5px] ${selected ? 'border-rose-500 bg-rose-500' : theme === 'dark' ? 'border-[#3a3a55]' : 'border-[#c8c8d8]'}`}>
+                  {selected && <span className="text-[12px] font-bold text-white">✓</span>}
+                </button>
+              )}
+              {/* Completion checkbox */}
               <motion.button
                 whileTap={visuallyCompleted ? {} : { scale: 0.82 }}
                 whileHover={visuallyCompleted ? {} : { scale: 1.1 }}

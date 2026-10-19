@@ -126,6 +126,18 @@ export function useDeleteTask() {
   })
 }
 
+export function useDiscardTasks() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ taskIds, reason }: { taskIds: string[]; reason?: string }) =>
+      apiClient.post<Task[]>('/tasks/discard', { taskIds, reason }).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: taskKeys.all })
+      qc.invalidateQueries({ queryKey: [...PLAN_KEYS.all, 'tasks'] })
+    },
+  })
+}
+
 // Complete task (shorthand update)
 export function useCompleteTask() {
   const qc = useQueryClient()

@@ -154,7 +154,7 @@ export default function PlanDetailPage() {
         </div>
 
         <div className="mb-5 flex flex-wrap gap-2" aria-label="Filter tasks">
-          {['all', 'pending', 'completed', 'graveyard'].map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} className={`min-h-11 rounded-lg border px-4 text-sm ${filter === value ? 'border-indigo-500 bg-indigo-500/10 text-indigo-500' : `${t.border} ${t.body}`}`}>{value === 'all' ? 'All tasks' : value === 'pending' ? 'To do' : value === 'completed' ? 'Completed' : 'Graveyard'}</button>)}
+          {['all', 'pending', 'completed', 'graveyard', 'discarded'].map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)} className={`min-h-11 rounded-lg border px-4 text-sm ${filter === value ? 'border-indigo-500 bg-indigo-500/10 text-indigo-500' : `${t.border} ${t.body}`}`}>{value === 'all' ? 'All tasks' : value === 'pending' ? 'To do' : value === 'completed' ? 'Completed' : value === 'graveyard' ? 'Graveyard' : 'Discarded'}</button>)}
         </div>
         {tasksError && <div role="alert" className={`rounded-xl border p-6 ${t.border} ${t.body}`}><p>We couldn’t load the tasks for this plan.</p><button onClick={() => refetchTasks()} className="mt-3 min-h-11 rounded-lg border px-4 text-sm">Try again</button></div>}
         {tasksLoading && (

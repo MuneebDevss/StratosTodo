@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api-client';
+import { apiClient, clearTokens } from '@/lib/api-client';
 import React, { createContext, useContext, useMemo } from 'react';
 
 export interface User {
@@ -79,9 +79,15 @@ export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
-      await apiClient.post('/auth/logout');
+      try {
+        await apiClient.post('/auth/logout');
+      } finally {
+        // Authentication is token-based and currently has no server-side session
+        // to revoke. Always clear the local session, even if the API is offline.
+        clearTokens();
+      }
     },
-    onSuccess: (_) => {
+    onSettled: () => {
       queryClient.removeQueries({ queryKey: USER_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEY });
     }
